@@ -1,0 +1,10 @@
+SLURM_JOBID=6324265
+SLURM_JOB_NODELIST=scq2
+SLURM_NNODES=1
+SLURMTMPDIR=
+working directory = /piech/u/lukeai/thrun_bpam
+srun: error: Unable to create step for job 6324265: More processors requested than permitted
+NPROCS=0
+MNIST found
+CIFAR-10 found
+Done

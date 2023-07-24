@@ -28,4 +28,4 @@ else
 fi
 
 # 3. Run the experiments
-#python experiments/run_scaling_experiment.py
+python experiments/run_scaling_experiment.py
