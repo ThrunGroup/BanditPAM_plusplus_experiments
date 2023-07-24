@@ -10,6 +10,7 @@ from scripts.constants import (
     ALL_BANDITPAMS,
     BANDITPAM_ORIGINAL_NO_CACHING,
     BANDITPAM_VA_NO_CACHING,
+    BANDITPAM_VA_CACHING,
     # Datasets
     MNIST,
     CIFAR,
@@ -76,7 +77,7 @@ def run_scaling_experiment_with_n():
             scaling_experiment_with_n(
                 dataset_name=dataset,
                 loss=loss,
-                algorithms=ALL_BANDITPAMS,
+                algorithms=[BANDITPAM_VA_CACHING],
                 n_medoids=n_medoids,
                 num_data_list=num_data_list,
                 dirname="scrna",
