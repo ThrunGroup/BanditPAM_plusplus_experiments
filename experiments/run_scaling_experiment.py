@@ -69,20 +69,20 @@ def run_scaling_experiment_with_n():
     Runs scaling experiments varying the number of data points (n) for the
     MNIST and CIFAR datasets using all BanditPAM algorithms.
     """
-    for dataset in [SCRNA]:
+    for dataset in [CIFAR]:
         loss = get_loss_function(dataset)
         num_data_list = get_num_data_list(dataset)
-        for n_medoids in [5]:
-            np.random.seed(0)
+        for n_medoids in [10]:
+            np.random.seed(1)
             scaling_experiment_with_n(
                 dataset_name=dataset,
                 loss=loss,
                 algorithms=[BANDITPAM_VA_CACHING],
                 n_medoids=n_medoids,
                 num_data_list=num_data_list,
-                dirname="scrna",
+                dirname="cifar",
                 num_experiments=10,
-                parallelize=False,
+                parallelize=True,
             )
 
 

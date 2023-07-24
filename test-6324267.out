@@ -1,0 +1,9 @@
+SLURM_JOBID=6324267
+SLURM_JOB_NODELIST=scq2
+SLURM_NNODES=1
+SLURMTMPDIR=
+working directory = /piech/u/lukeai/thrun_bpam
+NPROCS=4
+MNIST found
+CIFAR-10 found
+Done
