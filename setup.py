@@ -435,6 +435,7 @@ class BuildExt(build_ext):
 def main():
     if sys.platform == "linux" or sys.platform == "linux2":
         include_dirs = [
+            "/piech/u/lukeai/armadillo-code/include/armadillo_bits",
             get_pybind_include(),
             get_numpy_include(),
             "headers",
@@ -443,7 +444,6 @@ def main():
             os.path.join("headers", "carma", "include"),
             os.path.join("headers", "carma", "include", "carma_bits"),
             os.path.join("/", "usr", "local", "include"),
-            "/piech/u/lukeai/armadillo-code/include",
         ]
     elif sys.platform == "darwin":  # OSX
         include_dirs = [
