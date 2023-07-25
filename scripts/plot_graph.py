@@ -269,11 +269,11 @@ def create_scaling_plots(
 
 if __name__ == "__main__":
     create_scaling_plots(
-        datasets=[SCRNA],
+        datasets=[CIFAR],
         algorithms=[ALL_BANDITPAMS],
         x_axes=[NUM_DATA],
-        y_axes=[SAMPLE_COMPLEXITY, RUNTIME, LOSS],
-        is_logspace_y=False,
-        dir_name="new_scrna",
+        y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
+        is_logspace_y=True,
+        dir_name="cifar",
         include_error_bar=True,
     )
