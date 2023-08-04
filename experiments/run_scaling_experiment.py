@@ -55,36 +55,14 @@ def run_scaling_experiment_with_k():
     Runs scaling experiments varying the number of medoids (k) for the MNIST
     and CIFAR datasets using all BanditPAM algorithms.
     """
-    for dataset in [MNIST, CIFAR]:
+    for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
             loss=loss,
-            algorithms=ALL_BANDITPAMS,
-            n_medoids_list=[5, 8, 10],
+            algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
+            n_medoids_list=[15],
         )
-
-
-def run_scaling_experiment_with_n():
-    """
-    Runs scaling experiments varying the number of data points (n) for the
-    MNIST and CIFAR datasets using all BanditPAM algorithms.
-    """
-    for dataset in [CIFAR]:
-        loss = get_loss_function(dataset)
-        num_data_list = get_num_data_list(dataset)
-        for n_medoids in [10]:
-            np.random.seed(1)
-            scaling_experiment_with_n(
-                dataset_name=dataset,
-                loss=loss,
-                algorithms=[BANDITPAM_ORIGINAL_CACHING],
-                n_medoids=n_medoids,
-                num_data_list=num_data_list,
-                dirname="cifar2",
-                num_experiments=10,
-                parallelize=True,
-            )
 
 
 def run_debug_scrna():
@@ -111,5 +89,82 @@ def run_debug_scrna():
                 )
 
 
+def run_build_vs_swap():
+    """
+    Runs scaling experiments varying the number of data points (n) for the
+    MNIST and CIFAR datasets using all BanditPAM algorithms.
+    """
+    for dataset in [MNIST, CIFAR]:
+        loss = get_loss_function(dataset)
+        num_data_list = [get_num_data_list(dataset)[-1]]
+        parallel = dataset is not SCRNA
+        for n_swaps in [0, 1]:
+            for n_medoids in [5, 10, 15]:
+                np.random.seed(0)
+                scaling_experiment_with_n(
+                    dataset_name=dataset,
+                    loss=loss,
+                    algorithms=ALL_BANDITPAMS,
+                    n_medoids=n_medoids,
+                    num_data_list=num_data_list,
+                    dirname="build_only",
+                    num_experiments=3,
+                    parallelize=parallel,
+                    n_swaps=n_swaps,
+                )
+
+
+def run_speedup_summary_table():
+    """
+    Runs scaling experiments varying the number of data points (n) for the
+    MNIST and CIFAR datasets using all BanditPAM algorithms.
+    """
+
+    for dataset in [MNIST, CIFAR, SCRNA]:
+        loss = get_loss_function(dataset)
+        num_data_list = [
+            get_num_data_list(dataset)[0],
+            get_num_data_list(dataset)[-1],
+        ]
+
+        np.random.seed(0)
+        scaling_experiment_with_n(
+            dataset_name=dataset,
+            loss=loss,
+            algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
+            n_medoids=100,
+            num_data_list=num_data_list,
+            dirname=dataset,
+            num_experiments=3,
+            parallelize=True,
+            n_swaps=2,
+        )
+
+
+def run_scaling_experiment_with_n():
+    """
+    Runs scaling experiments varying the number of data points (n) for the
+    MNIST and CIFAR datasets using all BanditPAM algorithms.
+    """
+    # change the exp idx back to 2
+    for dataset in [MNIST]:
+        loss = get_loss_function(dataset)
+        num_data_list = get_num_data_list(dataset)
+        for n_medoids in [2]:
+            np.random.seed(0)
+            scaling_experiment_with_n(
+                dataset_name=dataset,
+                loss=loss,
+                algorithms=[BANDITPAM_VA_CACHING],
+                n_medoids=n_medoids,
+                num_data_list=num_data_list,
+                dirname="test",
+                num_experiments=1,
+                parallelize=True,
+            )
+
+
 if __name__ == "__main__":
     run_scaling_experiment_with_n()
+    # run_speedup_summary_table()
+    # run_build_vs_swap()

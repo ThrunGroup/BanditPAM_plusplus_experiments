@@ -11,6 +11,7 @@ from constants import (
     CIFAR,
     # algorithms
     BANDITPAM_ORIGINAL_NO_CACHING,
+    BANDITPAM_VA_CACHING,
     ALL_BANDITPAMS,
     # experiment settings
     NUM_DATA,
@@ -19,13 +20,8 @@ from constants import (
     LOSS,
     # utils
     ALG_TO_COLOR,
+    ALG_TO_LABEL,
 )
-
-
-def extract_algorithm_from_filename(filename):
-    for algorithm in ALL_BANDITPAMS:
-        if algorithm in filename:
-            return algorithm
 
 
 def translate_experiment_setting(dataset, setting, num_seeds):
@@ -140,6 +136,7 @@ def create_scaling_plots(
     is_logspace_y: bool = False,
     include_error_bar: bool = False,
     dir_name: str = None,
+    settings: List[str] = None,
 ):
     """
     Plot the scaling experiments from the data stored in the logs file.
@@ -181,16 +178,19 @@ def create_scaling_plots(
             # list available settings by parsing the log file names.
             # for example, "settings" returns ["k5", "k10"]
             # if the experiment used "k = 5" and "k = 10" settings
-            settings = list(set([file.split("_")[-2] for file in csv_files]))
+            if not settings:
+                settings = list(
+                    set([file.split("_")[-2] for file in csv_files])
+                )
 
             for setting in settings:
                 for y_axis in y_axes:
                     baseline_losses = 1.0
-                    for algorithm in ALL_BANDITPAMS:
+                    for algorithm in algorithms:
                         algorithm_files = glob.glob(
                             os.path.join(
                                 log_dir,
-                                f"*{algorithm}*{dataset}*" f"{setting}*idx*",
+                                f"*{algorithm}*{dataset}*{setting}*idx*",
                             )
                         )
                         num_seeds = len(algorithm_files)
@@ -231,7 +231,7 @@ def create_scaling_plots(
                             x,
                             y,
                             color=ALG_TO_COLOR[algorithm],
-                            label=algorithm,
+                            label=ALG_TO_LABEL[algorithm],
                         )
                         plt.plot(x, y, color=ALG_TO_COLOR[algorithm])
 
@@ -247,9 +247,6 @@ def create_scaling_plots(
                         # Sort the legend entries (labels and handles)
                         # by labels
                         handles, labels = plt.gca().get_legend_handles_labels()
-                        labels, handles = zip(
-                            *sorted(zip(labels, handles), key=lambda t: t[0])
-                        )
                         plt.legend(handles, labels, loc="upper left")
 
                         x_title, y_title, title = get_titles(
@@ -264,16 +261,43 @@ def create_scaling_plots(
                         plt.xlabel(x_label)
                         plt.ylabel(y_label)
 
+                        if algorithm in algorithms:
+                            print(title)
+                            print(algorithm)
+                            print(x)
+                            print(y)
+
                     plt.show()
 
 
 if __name__ == "__main__":
+    # create_scaling_plots(
+    #     datasets=[CIFAR],
+    #     algorithms=[ALL_BANDITPAMS],
+    #     x_axes=[NUM_DATA],
+    #     y_axes=[RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name="cifar",
+    #     include_error_bar=True,
+    # )
+
     create_scaling_plots(
-        datasets=[CIFAR],
-        algorithms=[ALL_BANDITPAMS],
+        datasets=[SCRNA],
+        algorithms=ALL_BANDITPAMS,
         x_axes=[NUM_DATA],
-        y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
-        is_logspace_y=True,
-        dir_name="cifar",
+        y_axes=[RUNTIME],
+        is_logspace_y=False,
+        dir_name="scrna",
         include_error_bar=True,
+        settings=["k5"],
     )
+
+    # create_scaling_plots(
+    #     datasets=[MNIST],
+    #     algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
+    #     x_axes=[NUM_DATA],
+    #     y_axes=[RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name="mnist",
+    #     include_error_bar=True,
+    # )

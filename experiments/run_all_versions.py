@@ -19,7 +19,7 @@ def run_banditpam(
     parallelize=True,
     n_swaps=100,
     build_confidence=5,
-    swap_confidence=5,
+    swap_confidence=3,
 ):
     if algorithm_name == BANDITPAM_ORIGINAL_NO_CACHING:
         algorithm = "BanditPAM_orig"

@@ -120,6 +120,10 @@ namespace km {
     return steps;
   }
 
+  std::vector<float> KMedoids::getLossHistory() const {
+    return loss_history;
+  }
+
   size_t KMedoids::getNMedoids() const {
     return nMedoids;
   }
@@ -299,7 +303,6 @@ namespace km {
     }
   }
 
-
   void KMedoids::calcBestDistancesSwap(
           const arma::fmat &data,
           std::optional<std::reference_wrapper<const arma::fmat>> distMat,
@@ -341,7 +344,7 @@ namespace km {
           const arma::urowvec *medoidIndices) {
     float total = 0;
     // TODO(@motiwari): is this parallel loop accumulating properly?
-    #pragma omp parallel for if (this->parallelize)
+//    #pragma omp parallel for if (this->parallelize)
     for (size_t i = 0; i < data.n_cols; i++) {
       float cost = std::numeric_limits<float>::infinity();
       for (size_t k = 0; k < nMedoids; k++) {
@@ -458,3 +461,5 @@ namespace km {
     return arma::accu(arma::abs(data.col(i) - data.col(j)));
   }
 }  // namespace km
+
+

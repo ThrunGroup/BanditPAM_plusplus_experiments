@@ -1,0 +1,2 @@
+num_data,num_medoids,loss,misc_complexity,build_complexity,swap_complexity,number_of_swaps,cache_writes,cache_hits,cache_misses,total_complexity_without_misc,total_complexity_with_misc,total_complexity_with_caching,average_complexity_with_caching,average_runtime,total_runtime
+10000,3,92.15672302246094,18422387,10149711,19184079,3,5321283,25888000,39908118,29333790,47756177,21868177,5467044.25,2.732958734035492,10.931834936141968

@@ -49,7 +49,7 @@ namespace km {
     steps = 0;
     BanditPAM::build(data, distMat, &medoidIndices, &medoidMatrix);
 
-    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
+//    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
 
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
@@ -280,6 +280,10 @@ namespace km {
       // use difference of loss for sigma and sampling, not absolute
       useAbsolute = false;
     }
+
+    // log the loss
+    buildLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
+    loss_history.push_back(buildLoss);
   }
 
   arma::fmat BanditPAM::swapSigma(
@@ -601,11 +605,14 @@ namespace km {
 
        std::cout << "Medoids: ";
        arma::uword numElements = medoidIndices->n_elem;
-        for (arma::uword i = 0; i < numElements; i++) {
-        std::cout << (*medoidIndices)(i) << " ";
-        }
-        std::cout << std::endl;
+       for (arma::uword i = 0; i < numElements; i++) {
+            std::cout << (*medoidIndices)(i) << " ";
+       }
+       std::cout << std::endl;
 
+      float loss = KMedoids::calcLoss(data, distMat, medoidIndices);
+      loss_history.push_back(loss);
+      std::cout << "Loss: " << loss << std::endl;
     }
   }
 }  // namespace km

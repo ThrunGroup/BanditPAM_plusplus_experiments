@@ -7,6 +7,7 @@
 #include <carma>
 #include <armadillo>
 #include <string>
+#include <vector>
 
 #include "kmedoids_algorithm.hpp"
 
@@ -72,6 +73,10 @@ class KMedoidsWrapper : public km::KMedoids {
    * nearest medoid
    */
   float getLossPython();
+
+
+  // TODO: @Luke : Add the docstring
+  std::vector<float> getLossHistoryPython();
 
   /**
    * @brief Returns the loss after the BUILD step
@@ -169,6 +174,11 @@ class KMedoidsWrapper : public km::KMedoids {
   * @brief Binding for the C++ function KMedoids::calcLoss() (after BUILD step)
   */
   void build_loss_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
+
+  /**
+  * @brief Binding for the C++ function KMedoids::getLossHistory()
+  */
+  void loss_history_python(pybind11::class_ <KMedoidsWrapper> *cls);
 
   /**
   * @brief Binding for the C++ function KMedoids::getDistanceComputations()

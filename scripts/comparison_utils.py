@@ -33,8 +33,9 @@ def print_results(kmed, runtime):
         "average_complexity_with_caching: ",
         complexity_with_caching / (kmed.steps + 1),
     )
-    print("Runtime per swap:", runtime / kmed.steps)
+    print("Runtime per swap:", runtime / (kmed.steps + 1))
     print("Total runtime:", runtime)
+    print("Losses: ", kmed.losses)
 
 
 def store_results(kmed, runtime, log_dir, log_name, num_data, num_medoids):
@@ -55,7 +56,9 @@ def store_results(kmed, runtime, log_dir, log_name, num_data, num_medoids):
         "total_complexity_with_misc": kmed.getDistanceComputations(True),
         "total_complexity_with_caching": kmed.getDistanceComputations(True)
         - kmed.cache_hits,
-        "average_complexity_with_caching": kmed.swap_distance_computations
+        "average_complexity_with_caching": (
+            kmed.getDistanceComputations(True) - kmed.cache_hits
+        )
         / (kmed.steps + 1),
         # "runtime_per_swap": runtime / kmed.steps,
         "average_runtime": runtime / (kmed.steps + 1),

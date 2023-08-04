@@ -25,8 +25,12 @@ def read_dataset(dataset_name):
     elif dataset_name == CIFAR:
         filename = "cifar10"
         delimiter = ","
+    elif dataset_name == "reduced_scrna":
+        filename = "reduced_scrna5k"
+        delimiter = ","
     else:
-        filename = "scrna_reformat"
+        filename = "reduced_scrna"
+        # filename = "scrna_reformat"
         delimiter = ","
 
     dataset = pd.read_csv(
@@ -105,7 +109,7 @@ def debug(
     verbose=True,
     save_logs=True,
     cache_width=1000,
-    dirname="scaling_with_n",
+    dirname="mnist",
     parallelize=True,
     num_experiments=3,
     num_swaps=10,
@@ -134,7 +138,7 @@ def debug(
 
     print("Running sampling complexity experiment with n on ", dataset_name)
 
-    for experiment_index in range(num_experiments):
+    for experiment_index in range(8, num_experiments):
         print("\n\nExperiment: ", experiment_index)
         for num_data in num_data_list:
             print("\nNum data: ", num_data)
@@ -187,10 +191,11 @@ def scaling_experiment_with_n(
     loss: str = "L2",
     verbose=True,
     save_logs=True,
-    cache_width=1000,
-    dirname="scaling_with_n",
+    cache_width=2000,
+    dirname="mnist",
     parallelize=True,
     num_experiments=3,
+    n_swaps=10,
 ):
     """
     Runs a scaling experiment varying the number of data points (n), and stores
@@ -238,6 +243,7 @@ def scaling_experiment_with_n(
                     loss,
                     cache_width,
                     parallelize,
+                    n_swaps=n_swaps,
                 )
 
                 if verbose:
