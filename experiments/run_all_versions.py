@@ -15,7 +15,7 @@ def run_banditpam(
     data,
     n_medoids,
     loss,
-    cache_width=2000,
+    cache_width=10000,   # TODO: perhaps change to 10000 for speedup?
     parallelize=True,
     n_swaps=100,
     build_confidence=5,

@@ -37,7 +37,7 @@ def print_results(kmed, runtime):
     print("Total runtime:", runtime)
 
 
-def store_results(kmed, runtime, log_dir, log_name, num_data, num_medoids):
+def store_results(kmed, runtime, log_dir, log_name, num_data, num_medoids, confidence=None):
     # Create a dictionary with the printed values
     log_dict = {
         "num_data": num_data,
@@ -61,6 +61,11 @@ def store_results(kmed, runtime, log_dir, log_name, num_data, num_medoids):
         "average_runtime": runtime / (kmed.steps + 1),
         "total_runtime": runtime,
     }
+    
+    # this is for varying delta experiment
+    if confidence:  
+        log_dict["confidence"] = confidence
+
     log_pd_row = pd.DataFrame([log_dict])
 
     os.makedirs(log_dir, exist_ok=True)

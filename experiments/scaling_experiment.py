@@ -5,10 +5,12 @@ from scipy.spatial import distance_matrix
 
 from run_all_versions import run_banditpam
 from scripts.comparison_utils import print_results, store_results
+from data.newsgroups_to_csv import twenty_newsgroup_to_csv
 from scripts.constants import (
     # Datasets
     MNIST,
     CIFAR,
+    NEWSGROUPS,
 )
 
 
@@ -25,6 +27,12 @@ def read_dataset(dataset_name):
     elif dataset_name == CIFAR:
         filename = "cifar10"
         delimiter = ","
+    elif dataset_name == NEWSGROUPS:
+        filename = "20_newsgroups"
+        delimiter = ","
+        if not os.path.exists(os.path.join("data", f"{filename}.csv")):
+            print("processing newsgroups dataset")
+            twenty_newsgroup_to_csv()
     else:
         filename = "scrna_reformat"
         delimiter = ","
@@ -34,6 +42,9 @@ def read_dataset(dataset_name):
         delimiter=delimiter,
         header=None,
     ).to_numpy()
+
+    if dataset_name == NEWSGROUPS:
+        dataset = dataset[1:, 1:]
 
     print(dataset.shape)
     return dataset
@@ -47,8 +58,8 @@ def scaling_experiment_with_k(
     verbose=True,
     save_logs=True,
     cache_width=1000,
-    dirname="scaling_with_k",
-    num_experiments=3,
+    dirname="scaling_with_k_cluster",
+    num_experiments=1,  # TODO: used to be 3
 ):
     """
     Runs a scaling experiment varying the number of medoids (k), and stores the

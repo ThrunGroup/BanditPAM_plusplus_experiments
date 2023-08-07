@@ -17,6 +17,7 @@ NUM_MEDOIDS = "num_medoids"
 MNIST = "MNIST"
 SCRNA = "SCRNA"
 CIFAR = "CIFAR"
+NEWSGROUPS = "NEWSGROUPS"
 
 ALG_TO_COLOR = {
     BANDITPAM_ORIGINAL_NO_CACHING: "#8AB6D6",
@@ -28,3 +29,9 @@ ALG_TO_COLOR = {
 SAMPLE_COMPLEXITY = "Sample Complexity"
 RUNTIME = "total_runtime"
 LOSS = "loss"
+
+# varying delta corresponds to varying confidence intervals
+SWAP_CONFIDENCE_ARR = [0, 2, 5, 10]
+
+# 20newsgroups dataset size
+NEWSGROUPS_NUM_DATA = 10000

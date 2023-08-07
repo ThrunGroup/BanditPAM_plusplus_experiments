@@ -9,11 +9,13 @@ from constants import (
     MNIST,
     SCRNA,
     CIFAR,
+    NEWSGROUPS,
     # algorithms
     BANDITPAM_ORIGINAL_NO_CACHING,
     ALL_BANDITPAMS,
     # experiment settings
     NUM_DATA,
+    NUM_MEDOIDS,
     RUNTIME,
     SAMPLE_COMPLEXITY,
     LOSS,
@@ -268,12 +270,22 @@ def create_scaling_plots(
 
 
 if __name__ == "__main__":
+    # create_scaling_plots(
+    #     datasets=[NEWSGROUPS],
+    #     algorithms=[ALL_BANDITPAMS],
+    #     x_axes=[NUM_MEDOIDS],
+    #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name='20newsgroups',    # TODO: add task to distinguish with k and with n
+    #     include_error_bar=True,
+    # )
+
     create_scaling_plots(
-        datasets=[CIFAR],
+        datasets=[NEWSGROUPS],
         algorithms=[ALL_BANDITPAMS],
         x_axes=[NUM_DATA],
         y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
-        is_logspace_y=True,
-        dir_name="cifar",
+        is_logspace_y=False,
+        dir_name='newsgroups_scaling_with_n',    # TODO: add task to distinguish with k and with n
         include_error_bar=True,
     )
