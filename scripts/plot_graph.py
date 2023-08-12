@@ -12,15 +12,18 @@ from constants import (
     NEWSGROUPS,
     # algorithms
     BANDITPAM_ORIGINAL_NO_CACHING,
+    BANDITPAM_VA_CACHING,
     ALL_BANDITPAMS,
     # experiment settings
     NUM_DATA,
+    VAR_DELTA,
     NUM_MEDOIDS,
     RUNTIME,
     SAMPLE_COMPLEXITY,
     LOSS,
     # utils
     ALG_TO_COLOR,
+    ALG_TO_LABEL,
 )
 
 
@@ -34,27 +37,32 @@ def translate_experiment_setting(dataset, setting, num_seeds):
     """
     Translate a setting into a human-readable format For example, "k5" becomes
     "Num medoids: 5".
+    TODO: removed seed in title
     """
     if "k" in setting:
-        return (
-            f"({dataset}, ${setting[0]}={setting[1:]}$, Seeds ="
-            f" {num_seeds})"
-        )
+        #TODO: make this consistent... for now it's hacky
+        return f"({dataset}, n=10000)"
+
+
+        # return (
+        #     f"({dataset}, ${setting[0]}={setting[1:]}$)"
+        # )
     elif "n" in setting:
         return (
-            f"({dataset}, ${setting[0]}={setting[1:]}$, Seeds "
-            f"= {num_seeds})"
+            f"({dataset}, ${setting[0]}={setting[1:]}$)"
         )
     else:
         assert False, "Invalid setting"
 
 
 def get_x_label(x_axis, is_logspace_x):
-    x_label = (
-        "Dataset size ($n$)"
-        if x_axis == NUM_DATA
-        else "Number of medoids ($k$)"
-    )
+    if x_axis == NUM_DATA:
+        x_label = "Dataset size ($n$)"
+    elif x_axis == VAR_DELTA:
+        x_label = "Delta"
+    else:
+        x_label = "Number of medoids ($k$)"
+
     if is_logspace_x:
         x_label = f"ln({x_label})"
     return x_label
@@ -124,12 +132,11 @@ def get_titles(x_axis, y_axis, y_label, dataset, setting, num_seeds):
     if x_axis == NUM_DATA:
         x_title = "$n$"
     else:
-        x_title = "$n$"
+        x_title = "$k$"
     title = (
         f"{y_title} vs. {x_title} "
         f"{translate_experiment_setting(dataset, setting, num_seeds)}"
     )
-
     return x_title, y_title, title
 
 
@@ -165,11 +172,14 @@ def create_scaling_plots(
         # get log csv files
         if dir_name is None:
             parent_dir = os.path.dirname(os.path.abspath(__file__))
-            log_dir_name = (
-                "scaling_with_n_cluster"
-                if x_axis == NUM_DATA
-                else "scaling_with_k_cluster"
-            )
+
+            if x_axis == VAR_DELTA:
+                log_dir_name = "varying_delta"
+            elif x_axis == NUM_DATA:
+                log_dir_name = "scaling_with_n_cluster"
+            else:
+                log_dir_name = "scaling_with_k_cluster"
+
             log_dir = os.path.join(parent_dir, "logs", log_dir_name)
         else:
             root_dir = os.path.dirname(
@@ -189,6 +199,7 @@ def create_scaling_plots(
                 for y_axis in y_axes:
                     baseline_losses = 1.0
                     for algorithm in ALL_BANDITPAMS:
+
                         algorithm_files = glob.glob(
                             os.path.join(
                                 log_dir,
@@ -233,7 +244,7 @@ def create_scaling_plots(
                             x,
                             y,
                             color=ALG_TO_COLOR[algorithm],
-                            label=algorithm,
+                            label=ALG_TO_LABEL[algorithm],
                         )
                         plt.plot(x, y, color=ALG_TO_COLOR[algorithm])
 
@@ -270,22 +281,25 @@ def create_scaling_plots(
 
 
 if __name__ == "__main__":
+    # This is for scaling with k on newsgroups
     # create_scaling_plots(
     #     datasets=[NEWSGROUPS],
     #     algorithms=[ALL_BANDITPAMS],
     #     x_axes=[NUM_MEDOIDS],
     #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
     #     is_logspace_y=False,
-    #     dir_name='20newsgroups',    # TODO: add task to distinguish with k and with n
+    #     dir_name='20newsgroups',
     #     include_error_bar=True,
     # )
-
+    #
+    # this is for scaling with n on newsgroups
     create_scaling_plots(
         datasets=[NEWSGROUPS],
         algorithms=[ALL_BANDITPAMS],
-        x_axes=[NUM_DATA],
+        x_axes=[NUM_MEDOIDS],
         y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
         is_logspace_y=False,
-        dir_name='newsgroups_scaling_with_n',    # TODO: add task to distinguish with k and with n
+        dir_name='newsgroups_scaling_with_k',    # TODO: add task to distinguish with k and with n
         include_error_bar=True,
     )
+

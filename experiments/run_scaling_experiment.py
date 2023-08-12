@@ -47,12 +47,8 @@ def get_num_data_list(dataset):
         num_data = 70000
     elif dataset == CIFAR:
         num_data = 50000
-
     elif dataset == NEWSGROUPS:
-        # TODO: this is debugging settings
-        num_data = 4000
-        return np.linspace(1000, num_data, 4, dtype=int)
-
+        num_data = 50000
     else:
         num_data = 40000
 
@@ -65,14 +61,15 @@ def run_scaling_experiment_with_k():
     and CIFAR datasets using all BanditPAM algorithms.
     """
     # for dataset in [MNIST, CIFAR]: TODO uncomment this!
-    for dataset in [NEWSGROUPS]:
+    for dataset in [MNIST]:
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
             loss=loss,
             algorithms=ALL_BANDITPAMS,
-            n_medoids_list=[5, 8, 10],
-            dirname="20newsgroups"
+            n_medoids_list=[5, 10, 15],
+            dirname="scrna_scaling_with_k",
+            cache_width=50000,
         )
 
 
@@ -82,20 +79,22 @@ def run_scaling_experiment_with_n():
     provided datasets using all BanditPAM algorithms.
     """
     # TODO: run loop through all datasets
-    for dataset in [NEWSGROUPS]:
+    for dataset in [CIFAR]:
         loss = get_loss_function(dataset)
         num_data_list = get_num_data_list(dataset)
-        for n_medoids in [10]:
+        for n_medoids in [15]:
             np.random.seed(1)
             scaling_experiment_with_n(
                 dataset_name=dataset,
                 loss=loss,
-                algorithms=ALL_BANDITPAMS,
+                algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
                 n_medoids=n_medoids,
                 num_data_list=num_data_list,
-                dirname="newsgroups_scaling_with_n",
+                dirname=f"{dataset}_k15_build",
                 num_experiments=1,  # TODO: used to be 10
                 parallelize=True,
+                cache_width=50000,
+                verbose=False,
             )
 
 
@@ -124,5 +123,5 @@ def run_debug_scrna():
 
 
 if __name__ == "__main__":
-    # run_scaling_experiment_with_k()
+    #run_scaling_experiment_with_k()
     run_scaling_experiment_with_n()

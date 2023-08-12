@@ -57,7 +57,7 @@ def scaling_experiment_with_k(
     loss: str = "L2",
     verbose=True,
     save_logs=True,
-    cache_width=1000,
+    cache_width=50000,
     dirname="scaling_with_k_cluster",
     num_experiments=1,  # TODO: used to be 3
 ):
@@ -95,7 +95,7 @@ def scaling_experiment_with_k(
                     f"_idx{experiment_index}"
                 )
                 kmed, runtime = run_banditpam(
-                    algorithm, dataset, n_medoids, loss, cache_width
+                    algorithm, dataset, n_medoids, loss, cache_width, swap_confidence=10,
                 )
 
                 if verbose:
@@ -168,6 +168,7 @@ def debug(
                     cache_width,
                     parallelize,
                     n_swaps=num_swaps,
+                    swap_confidence=10,
                 )
 
                 banditpam_build_medoids = data[kmed.medoids, :]
@@ -198,10 +199,10 @@ def scaling_experiment_with_n(
     loss: str = "L2",
     verbose=True,
     save_logs=True,
-    cache_width=1000,
+    cache_width=50000,
     dirname="scaling_with_n",
     parallelize=True,
-    num_experiments=3,
+    num_experiments=1,
 ):
     """
     Runs a scaling experiment varying the number of data points (n), and stores
@@ -249,6 +250,8 @@ def scaling_experiment_with_n(
                     loss,
                     cache_width,
                     parallelize,
+                    n_swaps=0,  #TODO: this is to measure only BUILD
+                    swap_confidence=30,
                 )
 
                 if verbose:

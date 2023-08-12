@@ -10,7 +10,7 @@ def load_cifar_batch(file):
 
 
 # Define the directory where the data batches are stored
-directory = "cifar-10-batches-py/"
+directory = "data/cifar-10-batches-py/"
 
 # List of data batch files to load
 batches = [

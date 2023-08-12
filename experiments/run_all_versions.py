@@ -15,11 +15,11 @@ def run_banditpam(
     data,
     n_medoids,
     loss,
-    cache_width=10000,   # TODO: perhaps change to 10000 for speedup?
+    cache_width=50000,   # TODO: perhaps change to 10000 for speedup?
     parallelize=True,
-    n_swaps=100,
+    n_swaps=10,     # TODO: this used to be 100, but loss p much converges at 10..
     build_confidence=5,
-    swap_confidence=5,
+    swap_confidence=100,
 ):
     if algorithm_name == BANDITPAM_ORIGINAL_NO_CACHING:
         algorithm = "BanditPAM_orig"
