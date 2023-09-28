@@ -11,8 +11,10 @@ ALL_BANDITPAMS = [
     BANDITPAM_VA_CACHING,
 ]
 
+# Graph
 NUM_DATA = "num_data"
 NUM_MEDOIDS = "num_medoids"
+NUM_SWAPS = "num_swaps"
 
 MNIST = "MNIST"
 SCRNA = "SCRNA"
@@ -35,3 +37,4 @@ ALG_TO_LABEL = {
 SAMPLE_COMPLEXITY = "Sample Complexity"
 RUNTIME = "total_runtime"
 LOSS = "loss"
+LOSS_HISTORY = "loss_history"

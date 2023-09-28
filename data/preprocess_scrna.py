@@ -4,7 +4,7 @@ from sklearn.decomposition import TruncatedSVD
 dataset = pd.read_csv("scrna_reformat.csv", delimiter=",", header=None)
 
 # Create a TruncatedSVD object with n_components=2000 (desired dimension)
-svd = TruncatedSVD(n_components=1000)
+svd = TruncatedSVD(n_components=4000)
 
 # Fit the TruncatedSVD model to your data and transform it to the reduced dimension
 reduced_data = svd.fit_transform(dataset)

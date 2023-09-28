@@ -9,6 +9,8 @@ from scripts.constants import (
     # Datasets
     MNIST,
     CIFAR,
+    BANDITPAM_ORIGINAL_NO_CACHING,
+    BANDITPAM_VA_CACHING,
 )
 
 
@@ -46,6 +48,7 @@ def read_dataset(dataset_name):
 def scaling_experiment_with_k(
     dataset_name,
     n_medoids_list=None,
+    num_data=10000,
     algorithms=None,
     loss: str = "L2",
     verbose=True,
@@ -53,6 +56,10 @@ def scaling_experiment_with_k(
     cache_width=1000,
     dirname="scaling_with_k",
     num_experiments=3,
+    parallelize=True,
+    n_swaps=10,
+    build_confidence=3,
+    swap_confidence=10,
 ):
     """
     Runs a scaling experiment varying the number of medoids (k), and stores the
@@ -71,7 +78,7 @@ def scaling_experiment_with_k(
     :param num_experiments: The number of experiments to run
     """
     dataset = read_dataset(dataset_name)
-    num_data = len(dataset)
+    # num_data = len(dataset)
     log_dir = os.path.join("logs", dirname)
     print("Running sampling complexity experiment with k on ", dataset_name)
 
@@ -79,6 +86,8 @@ def scaling_experiment_with_k(
         print("\n\nExperiment: ", experiment_index)
         for n_medoids in n_medoids_list:
             print("\nNum medoids: ", n_medoids)
+            data_indices = np.random.randint(0, len(dataset), num_data)
+            dataset = dataset[data_indices]
             for algorithm in algorithms:
                 print("Running ", algorithm)
                 log_name = (
@@ -87,16 +96,44 @@ def scaling_experiment_with_k(
                     f"_n{num_data}"
                     f"_idx{experiment_index}"
                 )
+
+                if "with" in algorithm:
+                    algorithm_name = BANDITPAM_VA_CACHING
+                else:
+                    algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
+
+                build_only_csv = pd.read_csv(
+                    os.path.join(
+                        "logs",
+                        "build_only_all",
+                        f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",
+                    )
+                )
+                build_only_time = build_only_csv["total_runtime"][0]
+
                 kmed, runtime = run_banditpam(
-                    algorithm, dataset, n_medoids, loss, cache_width
+                    algorithm,
+                    dataset,
+                    n_medoids,
+                    loss,
+                    n_swaps=n_swaps,
+                    cache_width=cache_width,
+                    parallelize=parallelize,
                 )
 
                 if verbose:
-                    print_results(kmed, runtime)
+                    print_results(kmed, runtime, build_only_time)
 
                 if save_logs:
                     store_results(
-                        kmed, runtime, log_dir, log_name, num_data, n_medoids
+                        kmed,
+                        runtime,
+                        log_dir,
+                        log_name,
+                        num_data,
+                        n_medoids,
+                        save_loss_history=False,
+                        build_only_time=build_only_time,
                     )
 
 
@@ -191,11 +228,15 @@ def scaling_experiment_with_n(
     loss: str = "L2",
     verbose=True,
     save_logs=True,
-    cache_width=2000,
+    cache_width=20000,
     dirname="mnist",
     parallelize=True,
     num_experiments=3,
     n_swaps=10,
+    build_confidence=3,
+    swap_confidence=10,
+    save_loss_history=True,
+    num_data_indices=[0, 1, 2, 3],
 ):
     """
     Runs a scaling experiment varying the number of data points (n), and stores
@@ -223,7 +264,8 @@ def scaling_experiment_with_n(
 
     for experiment_index in range(num_experiments):
         print("\n\nExperiment: ", experiment_index)
-        for num_data in num_data_list:
+        for num_data_index in num_data_indices:
+            num_data = num_data_list[num_data_index]
             print("\nNum data: ", num_data)
             data_indices = np.random.randint(0, len(dataset), num_data)
             data = dataset[data_indices]
@@ -236,6 +278,25 @@ def scaling_experiment_with_n(
                     f"_idx{experiment_index}"
                 )
                 print(log_name)
+
+                if n_swaps == 0:
+                    build_only_time = 0
+                else:
+                    if "with" in algorithm:
+                        algorithm_name = BANDITPAM_VA_CACHING
+                    else:
+                        algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
+                    build_only_csv = pd.read_csv(
+                        os.path.join(
+                            "logs",
+                            "build_only_all",
+                            f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",
+                        )
+                    )
+                    build_only_time = build_only_csv["total_runtime"][
+                        num_data_index
+                    ]
+
                 kmed, runtime = run_banditpam(
                     algorithm,
                     data,
@@ -244,10 +305,12 @@ def scaling_experiment_with_n(
                     cache_width,
                     parallelize,
                     n_swaps=n_swaps,
+                    build_confidence=build_confidence,
+                    swap_confidence=swap_confidence,
                 )
 
                 if verbose:
-                    print_results(kmed, runtime)
+                    print_results(kmed, runtime, build_only_time)
 
                 if save_logs:
                     store_results(
@@ -257,4 +320,6 @@ def scaling_experiment_with_n(
                         log_name,
                         num_data,
                         n_medoids,
+                        save_loss_history,
+                        build_only_time,
                     )

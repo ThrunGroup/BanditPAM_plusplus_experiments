@@ -15,13 +15,22 @@ from constants import (
     ALL_BANDITPAMS,
     # experiment settings
     NUM_DATA,
+    NUM_MEDOIDS,
+    NUM_SWAPS,
     RUNTIME,
     SAMPLE_COMPLEXITY,
     LOSS,
+    LOSS_HISTORY,
     # utils
     ALG_TO_COLOR,
     ALG_TO_LABEL,
 )
+
+
+# plt.rcParams["figure.figsize"] = (8, 6)
+
+
+# from experiments.run_scaling_experiment import get_loss_function
 
 
 def translate_experiment_setting(dataset, setting, num_seeds):
@@ -29,33 +38,48 @@ def translate_experiment_setting(dataset, setting, num_seeds):
     Translate a setting into a human-readable format For example, "k5" becomes
     "Num medoids: 5".
     """
+    if dataset in [CIFAR, SCRNA]:
+        loss = "L1"
+    else:
+        loss = "L2"
+
     if "k" in setting:
         return (
-            f"({dataset}, ${setting[0]}={setting[1:]}$, Seeds ="
-            f" {num_seeds})"
+            f"({dataset}, ${setting[0]}={setting[1:]}$, {loss})"
+            # , Seeds ="
+            # f" {num_seeds})"
         )
     elif "n" in setting:
         return (
-            f"({dataset}, ${setting[0]}={setting[1:]}$, Seeds "
-            f"= {num_seeds})"
+            f"({dataset}, ${setting[0]}={setting[1:]}$)"
+            # f", Seeds "
+            # f"= {num_seeds})"
         )
     else:
         assert False, "Invalid setting"
 
 
 def get_x_label(x_axis, is_logspace_x):
-    x_label = (
-        "Dataset size ($n$)"
-        if x_axis == NUM_DATA
-        else "Number of medoids ($k$)"
-    )
+    if x_axis == NUM_DATA:
+        x_label = "Dataset size ($n$)"
+    elif x_axis == NUM_MEDOIDS:
+        x_label = "Number of medoids ($k$)"
+    elif x_axis == NUM_SWAPS:
+        x_label = "Number of swaps ($T$)"
+    else:
+        assert False
+
     if is_logspace_x:
         x_label = f"ln({x_label})"
+
     return x_label
 
 
 def get_x(data, x_axis, is_logspace_x):
-    x = data[x_axis].tolist()
+    if x_axis == NUM_SWAPS:
+        x = list(range(10))
+    else:
+        x = data[x_axis].tolist()
 
     if is_logspace_x:
         x = np.log(x)
@@ -66,10 +90,12 @@ def get_x(data, x_axis, is_logspace_x):
 def get_y_label(y_axis, is_logspace_y):
     if y_axis is LOSS:
         y_label = "Final Loss Normalized to BanditPAM ($L/L_{BanditPAM}$)"
+    elif y_axis is LOSS_HISTORY:
+        y_label = "Loss"
     elif y_axis is SAMPLE_COMPLEXITY:
         y_label = "Sample Complexity"
     else:
-        y_label = "Wall-clock Runtime"
+        y_label = "Wall-Clock Runtime"
 
     if is_logspace_y:
         y_label = f"ln({y_label})"
@@ -78,13 +104,14 @@ def get_y_label(y_axis, is_logspace_y):
 
 
 def get_y_and_error(
-    y_axis,
-    data_mean,
-    data_std,
-    algorithm,
-    is_logspace_y,
-    num_experiments,
-    baseline_losses=1.0,
+        y_axis,
+        data_mean,
+        data_std,
+        algorithm,
+        is_logspace_y,
+        num_experiments,
+        baseline_losses=1.0,
+        bpam_loss_history=None,
 ):
     if y_axis is LOSS:
         # Plot the loss divided by that of
@@ -96,12 +123,21 @@ def get_y_and_error(
             baseline_losses = y.copy()
         y /= baseline_losses
         error = data_std[y_axis].tolist()
+    elif y_axis is LOSS_HISTORY:
+        y = data_mean["loss"].tolist()
+        error = data_std["loss"].tolist()
+        if algorithm == BANDITPAM_ORIGINAL_NO_CACHING:
+            bpam_loss_history = y
+        else:
+            y = bpam_loss_history
     elif y_axis is SAMPLE_COMPLEXITY:
         y = data_mean["average_complexity_with_caching"].tolist()
         error = data_std["average_complexity_with_caching"].tolist()
     else:
-        y = data_mean["average_runtime"].tolist()
+        y = np.array(data_mean["average_runtime"].tolist())
         error = data_std["average_runtime"].tolist()
+        # y = data_mean["total_runtime"].tolist()
+        # error = data_std["total_runtime"].tolist()
 
     if is_logspace_y:
         y = np.log(y)
@@ -113,12 +149,16 @@ def get_y_and_error(
 def get_titles(x_axis, y_axis, y_label, dataset, setting, num_seeds):
     if y_axis == LOSS:
         y_title = "$L/L_{BanditPAM}$"
+    elif y_axis == LOSS_HISTORY:
+        y_title = "Loss"
     else:
         y_title = y_label
     if x_axis == NUM_DATA:
         x_title = "$n$"
+    elif x_axis == NUM_SWAPS:
+        x_title = "$T$"
     else:
-        x_title = "$n$"
+        x_title = "$k$"
     title = (
         f"{y_title} vs. {x_title} "
         f"{translate_experiment_setting(dataset, setting, num_seeds)}"
@@ -128,15 +168,15 @@ def get_titles(x_axis, y_axis, y_label, dataset, setting, num_seeds):
 
 
 def create_scaling_plots(
-    datasets: List[str] = [],
-    algorithms: List[str] = [],
-    x_axes=NUM_DATA,
-    y_axes=RUNTIME,
-    is_logspace_x: bool = False,
-    is_logspace_y: bool = False,
-    include_error_bar: bool = False,
-    dir_name: str = None,
-    settings: List[str] = None,
+        datasets: List[str] = [],
+        algorithms: List[str] = [],
+        x_axes=NUM_DATA,
+        y_axes=RUNTIME,
+        is_logspace_x: bool = False,
+        is_logspace_y: bool = False,
+        include_error_bar: bool = False,
+        dir_name: str = None,
+        settings: List[str] = None,
 ):
     """
     Plot the scaling experiments from the data stored in the logs file.
@@ -186,6 +226,7 @@ def create_scaling_plots(
             for setting in settings:
                 for y_axis in y_axes:
                     baseline_losses = 1.0
+                    bpam_loss_history = []
                     for algorithm in algorithms:
                         algorithm_files = glob.glob(
                             os.path.join(
@@ -198,8 +239,6 @@ def create_scaling_plots(
                             pd.read_csv(file) for file in algorithm_files
                         ]
                         data = pd.concat(algorithm_dfs)
-
-                        # Calculate the mean of each row across the files
                         data_mean = data.groupby(data.index).mean()
                         data_std = data.groupby(data.index).std() / np.sqrt(
                             len(data)
@@ -212,7 +251,7 @@ def create_scaling_plots(
                         # Set y axis
                         y_label = get_y_label(y_axis, is_logspace_y)
                         num_experiments = len(algorithm_files)
-                        y, error, baseline_losses = get_y_and_error(
+                        (y, error, baseline_losses) = get_y_and_error(
                             y_axis,
                             data_mean,
                             data_std,
@@ -220,7 +259,11 @@ def create_scaling_plots(
                             is_logspace_y,
                             num_experiments,
                             baseline_losses,
+                            bpam_loss_history,
                         )
+
+                        if algorithm == BANDITPAM_ORIGINAL_NO_CACHING:
+                            bpam_loss_history = y
 
                         # Sort the (x, y) pairs by the ascending order of x
                         x, y = zip(
@@ -261,36 +304,41 @@ def create_scaling_plots(
                         plt.xlabel(x_label)
                         plt.ylabel(y_label)
 
-                        if algorithm in algorithms:
-                            print(title)
-                            print(algorithm)
-                            print(x)
-                            print(y)
-
                     plt.show()
 
 
 if __name__ == "__main__":
-    # create_scaling_plots(
-    #     datasets=[CIFAR],
-    #     algorithms=[ALL_BANDITPAMS],
-    #     x_axes=[NUM_DATA],
-    #     y_axes=[RUNTIME],
-    #     is_logspace_y=False,
-    #     dir_name="cifar",
-    #     include_error_bar=True,
-    # )
-
     create_scaling_plots(
         datasets=[SCRNA],
         algorithms=ALL_BANDITPAMS,
-        x_axes=[NUM_DATA],
+        x_axes=[NUM_MEDOIDS],
         y_axes=[RUNTIME],
         is_logspace_y=False,
-        dir_name="scrna",
+        dir_name="scrna_scaling_with_k_conf15_cache10k",
         include_error_bar=True,
-        settings=["k5"],
     )
+
+    # create_scaling_plots(
+    #     datasets=[SCRNA],
+    #     algorithms=ALL_BANDITPAMS,
+    #     x_axes=[NUM_MEDOIDS],
+    #     y_axes=[RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name="scrna_scaling_with_k_7",
+    #     include_error_bar=False,
+    #     # settings=["k5"],
+    # )
+
+    # create_scaling_plots(
+    #     datasets=[MNIST, CIFAR],
+    #     algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
+    #     x_axes=[NUM_SWAPS],
+    #     y_axes=[LOSS_HISTORY],
+    #     is_logspace_y=False,
+    #     dir_name="swap_vs_loss_2",
+    #     include_error_bar=False,
+    #     settings=["k5", "k10"],
+    # )
 
     # create_scaling_plots(
     #     datasets=[MNIST],

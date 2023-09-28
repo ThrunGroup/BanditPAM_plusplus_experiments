@@ -12,6 +12,8 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+
 
 namespace km {
   void BanditPAM::fitBanditPAM(
@@ -39,6 +41,7 @@ namespace km {
       permutationIdx = 0;
       reindex = {};  // TODO(@motiwari): Can this intialization be removed?
       // TODO(@motiwari): Can we parallelize this?
+//      #pragma omp parallel for if (this->parallelize)
       for (size_t counter = 0; counter < m; counter++) {
         reindex[permutation[counter]] = counter;
       }
