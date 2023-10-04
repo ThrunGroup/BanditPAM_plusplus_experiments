@@ -6,21 +6,33 @@
 
 # 2. Install datasets if necessary
 cd data
+
 # MNIST
 if [ -e "MNIST_70k.csv" ]; then
     echo "MNIST found"
 else
-    echo "Installing MNIST..."
+    echo "Downloading MNIST..."
     curl -XGET https://motiwari.com/banditpam_data/MNIST_70k.tar.gz > MNIST_70k.tar.gz
     tar -xzvf MNIST_70k.tar.gz
     rm MNIST_70k.tar.gz
+fi
+
+# scRNA
+if [ -e "reduced_scrna.csv" ]; then
+    echo "scRNA found"
+else
+    echo "Downloading scRNA..."
+    curl -XGET https://motiwari.com/banditpam_data/scrna_reformat.csv.gz > scRNA_reformat.csv.gz
+    # Preprocess the dataset. Don't need to unzip because pandas can read .csv.gz files
+    echo "Preprocessing the scRNA dataset..."
+    python preprocess_scrna.py
 fi
 
 # CIFAR-10
 if [ -e "cifar10.csv" ]; then
     echo "CIFAR-10 found"
 else
-    echo "Installing CIFAR-10..."
+    echo "Downloading CIFAR-10..."
     curl -XGET https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz > cifar-10-python.tar.gz
     tar -xzvf cifar-10-python.tar.gz
     rm cifar-10-python.tar.gz
@@ -28,6 +40,7 @@ else
     echo "Preprocessing the CIFAR dataset..."
     python preprocess_cifar.py
 fi
+
 cd -  # Go back to directory from where script was run
 
 # 3. Run the experiments

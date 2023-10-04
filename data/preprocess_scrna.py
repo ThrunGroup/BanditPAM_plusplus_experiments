@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.decomposition import TruncatedSVD
 
 if __name__ == "__main__":
-    dataset = pd.read_csv("scrna_reformat.csv", delimiter=",", header=None)
+    dataset = pd.read_csv("scrna_reformat.csv.gz", delimiter=",", header=None)
 
     # Create a TruncatedSVD object with n_components=4000 (desired dimension)
     svd = TruncatedSVD(n_components=4000)
