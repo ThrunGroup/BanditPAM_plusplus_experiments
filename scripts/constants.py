@@ -45,6 +45,7 @@ LOSS = "loss"
 # varying delta corresponds to varying confidence intervals
 SWAP_CONFIDENCE_ARR = [2, 3, 5, 10]
 
-# 20newsgroups dataset size
+# 20 Newsgroups dataset size
 NEWSGROUPS_NUM_DATA = 10000
+
 LOSS_HISTORY = "loss_history"

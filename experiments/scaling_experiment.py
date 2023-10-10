@@ -3,9 +3,8 @@ import os
 import pandas as pd
 from scipy.spatial import distance_matrix
 
-from run_all_versions import run_algorithm
+from experiments.run_all_versions import run_algorithm
 from scripts.comparison_utils import print_results, store_results
-from data.newsgroups_to_csv import twenty_newsgroup_to_csv
 from scripts.constants import (
     # Datasets
     MNIST,
@@ -33,9 +32,6 @@ def read_dataset(dataset_name):
     elif dataset_name == NEWSGROUPS:
         filename = "20_newsgroups"
         delimiter = ","
-        if not os.path.exists(os.path.join("data", f"{filename}.csv")):
-            print("processing newsgroups dataset")
-            twenty_newsgroup_to_csv()
     else:
         filename = "reduced_scrna"
         delimiter = ","
@@ -197,7 +193,7 @@ def scaling_experiment_with_n(
             data_indices = np.random.randint(0, len(dataset), num_data)
             data = dataset[data_indices]
             for algorithm in algorithms:
-                print("\n<Running ", algorithm, ">")
+                print("\nRunning ", algorithm, "...")
                 log_name = (
                     f"{algorithm}"
                     f"_{dataset_name}"
@@ -299,7 +295,7 @@ def debug(
             data_indices = np.random.randint(0, len(dataset), num_data)
             data = dataset[data_indices]
             for algorithm in algorithms:
-                print("\n<Running ", algorithm, ">")
+                print("\nRunning ", algorithm, "...")
                 log_name = (
                     f"{algorithm}"
                     f"_{dataset_name}"

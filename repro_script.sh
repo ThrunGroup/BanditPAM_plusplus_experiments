@@ -4,6 +4,7 @@
 
 # Install prerequisites
 pip install -r requirements.txt
+brew install libomp armadillo
 
 # Remove files possibly left over from previous builds
 sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && sudo python -m pip uninstall -y banditpam
@@ -47,6 +48,14 @@ else
     # Preprocess the dataset. Don't need to unzip because pandas can read .csv.gz files
     echo "Preprocessing the scRNA dataset..."
     python preprocess_scrna.py
+fi
+
+# 20 Newsgroups
+if [ -e "20_newsgroups.csv" ]; then
+  echo "20 Newsgroups found"
+else
+  echo "Preprocessing 20 newsgroups"
+  python newsgroups_to_csv.py
 fi
 
 cd -  # Go back to directory from where script was run

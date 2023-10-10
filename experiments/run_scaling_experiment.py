@@ -1,6 +1,6 @@
 import numpy as np
 
-from scaling_experiment import (
+from experiments.scaling_experiment import (
     scaling_experiment_with_k,
     scaling_experiment_with_n,
     debug,

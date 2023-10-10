@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from scipy.spatial import distance_matrix
 
-from run_all_versions import run_banditpam
-from scaling_experiment import read_dataset
+from experiments.run_all_versions import run_banditpam
+from experiments.scaling_experiment import read_dataset
 from scripts.comparison_utils import print_results, store_results
 from scripts.constants import (
     SWAP_CONFIDENCE_ARR,
