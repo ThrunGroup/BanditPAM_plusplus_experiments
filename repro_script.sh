@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# 1. Install BanditPAM from the source
-#pip install -r requirements.txt
-#pip install -e .
+# 1. Install the BanditPAM package
+
+# Install prerequisites
+pip install -r requirements.txt
+
+# Remove files possibly left over from previous builds
+sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && sudo python -m pip uninstall -y banditpam
+
+# Install BanditPAM package
+sudo python -m pip install --no-use-pep517  --no-cache-dir --ignore-installed -vvvvv -e .
 
 # 2. Install datasets if necessary
+mkdir -p data
 cd data
 
 # MNIST
