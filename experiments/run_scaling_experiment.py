@@ -8,10 +8,7 @@ from scaling_experiment import (
 from scripts.constants import (
     # Algorithms
     ALL_BANDITPAMS,
-    BANDITPAM_ORIGINAL_NO_CACHING,
-    BANDITPAM_ORIGINAL_CACHING,
     BANDITPAM_VA_NO_CACHING,
-    BANDITPAM_VA_CACHING,
     # Datasets
     MNIST,
     CIFAR,
@@ -26,10 +23,12 @@ def get_loss_function(dataset):
     :param dataset: A string that represents the name of the dataset
     :return: A string indicating the type of loss function ("L1" or "L2")
     """
-    if dataset in [CIFAR, SCRNA]:
+    if dataset in [MNIST]:
+        return "L2"
+    elif dataset in [CIFAR, SCRNA]:
         return "L1"
     else:
-        return "L2"
+        raise Exception("Bad dataset name")
 
 
 def get_num_data_list(dataset):
@@ -44,52 +43,29 @@ def get_num_data_list(dataset):
         num_data = 70000
     elif dataset == CIFAR:
         num_data = 50000
-    else:
+    elif dataset == SCRNA:
         num_data = 40000
+    else:
+        raise Exception("Bad dataset name")
 
     return np.linspace(10000, num_data, 4, dtype=int)
 
 
 def run_scaling_experiment_with_k():
     """
-    Runs scaling experiments varying the number of medoids (k) for the MNIST
-    and CIFAR datasets using all BanditPAM algorithms.
+    Runs scaling experiments varying the number of medoids k for all datasets using all BanditPAM algorithms.
     """
-    for dataset in [SCRNA]:
+    for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
             loss=loss,
-            algorithms=[BANDITPAM_VA_CACHING],  # BANDITPAM_ORIGINAL_NO_CACHING
+            algorithms=ALL_BANDITPAMS,
             n_medoids_list=[15],
             cache_width=40000,
             parallelize=False,
             n_swaps=1,
         )
-
-
-def run_debug_scrna():
-    for dataset in [SCRNA]:
-        loss = get_loss_function(dataset)
-        num_data_list = [3000]
-        for par in [False]:
-            print("\n\n\n\nParallelize: ", par)
-            num_iters = 5 if par else 2
-
-            for _ in range(num_iters):
-                np.random.seed(0)
-                debug(
-                    dataset_name=dataset,
-                    loss=loss,
-                    algorithms=[BANDITPAM_VA_NO_CACHING],
-                    n_medoids=5,
-                    num_data_list=num_data_list,
-                    dirname="new_scrna",
-                    parallelize=par,
-                    num_experiments=1,
-                    num_swaps=5,
-                    save_logs=False,
-                )
 
 
 def run_build_only():
@@ -115,10 +91,7 @@ def run_build_only():
             scaling_experiment_with_n(
                 dataset_name=dataset,
                 loss=loss,
-                algorithms=[
-                    BANDITPAM_ORIGINAL_NO_CACHING,
-                    BANDITPAM_VA_CACHING,
-                ],
+                algorithms=ALL_BANDITPAMS,
                 n_medoids=n_medoids,
                 num_data_list=num_data_list,
                 dirname="build_only",
@@ -197,6 +170,33 @@ def run_swap_vs_loss():
                 build_confidence=3,
                 swap_confidence=5,
             )
+
+def run_debug_scrna():
+    """
+    Used to debug the weird results we got on scRNA dataset when using parallelization.
+
+    """
+    for dataset in [SCRNA]:
+        loss = get_loss_function(dataset)
+        num_data_list = [3000]
+        for par in [False]:
+            print("\n\n\n\nParallelize: ", par)
+            num_iters = 5 if par else 2
+
+            for _ in range(num_iters):
+                np.random.seed(0)
+                debug(
+                    dataset_name=dataset,
+                    loss=loss,
+                    algorithms=[BANDITPAM_VA_NO_CACHING],
+                    n_medoids=5,
+                    num_data_list=num_data_list,
+                    dirname="new_scrna",
+                    parallelize=par,
+                    num_experiments=1,
+                    num_swaps=5,
+                    save_logs=False,
+                )
 
 
 if __name__ == "__main__":

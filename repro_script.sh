@@ -17,17 +17,6 @@ else
     rm MNIST_70k.tar.gz
 fi
 
-# scRNA
-if [ -e "reduced_scrna.csv" ]; then
-    echo "scRNA found"
-else
-    echo "Downloading scRNA..."
-    curl -XGET https://motiwari.com/banditpam_data/scrna_reformat.csv.gz > scRNA_reformat.csv.gz
-    # Preprocess the dataset. Don't need to unzip because pandas can read .csv.gz files
-    echo "Preprocessing the scRNA dataset..."
-    python preprocess_scrna.py
-fi
-
 # CIFAR-10
 if [ -e "cifar10.csv" ]; then
     echo "CIFAR-10 found"
@@ -41,7 +30,18 @@ else
     python preprocess_cifar.py
 fi
 
+# scRNA
+if [ -e "reduced_scrna.csv" ]; then
+    echo "scRNA found"
+else
+    echo "Downloading scRNA..."
+    curl -XGET https://motiwari.com/banditpam_data/scrna_reformat.csv.gz > scRNA_reformat.csv.gz
+    # Preprocess the dataset. Don't need to unzip because pandas can read .csv.gz files
+    echo "Preprocessing the scRNA dataset..."
+    python preprocess_scrna.py
+fi
+
 cd -  # Go back to directory from where script was run
 
 # 3. Run the experiments
-python experiments/run_scaling_experiment.py
+python repro_script.py

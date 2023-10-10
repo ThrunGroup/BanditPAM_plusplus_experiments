@@ -10,7 +10,7 @@ from scripts.constants import (
 )
 
 
-def run_banditpam(
+def run_algorithm(
     algorithm_name,
     data,
     n_medoids,
