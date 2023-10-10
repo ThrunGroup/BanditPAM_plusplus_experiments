@@ -80,6 +80,7 @@ namespace km {
     fit_python(&cls);
     loss_python(&cls);
     build_loss_python(&cls);
+    loss_history_python(&cls);
 
     // Cache functions
     distance_computations_python(&cls);

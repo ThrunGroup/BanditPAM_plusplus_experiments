@@ -340,7 +340,7 @@ banditpam_float KMedoids::calcLoss(
   const arma::urowvec* medoidIndices) {
   banditpam_float total = 0;
   // TODO(@motiwari): is this parallel loop accumulating properly?
-  #pragma omp parallel for if (this->parallelize)
+//  #pragma omp parallel for if (this->parallelize)
   for (size_t i = 0; i < data.n_cols; i++) {
     banditpam_float cost = std::numeric_limits<banditpam_float>::infinity();
     for (size_t k = 0; k < nMedoids; k++) {

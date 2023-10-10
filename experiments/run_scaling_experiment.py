@@ -8,15 +8,14 @@ from scaling_experiment import (
 from scripts.constants import (
     # Algorithms
     ALL_BANDITPAMS,
-    BANDITPAM_ORIGINAL_NO_CACHING,
-    BANDITPAM_ORIGINAL_CACHING,
     BANDITPAM_VA_NO_CACHING,
-    BANDITPAM_VA_CACHING,
     # Datasets
     MNIST,
     CIFAR,
     SCRNA,
     NEWSGROUPS,
+    # Parameters
+    K_LIST,
 )
 
 
@@ -29,10 +28,12 @@ def get_loss_function(dataset):
     """
     if dataset in [NEWSGROUPS]:
         return "cos"
-    if dataset in [MNIST, SCRNA]:
+    elif dataset in [MNIST]:
+        return "L2"
+    elif dataset in [CIFAR, SCRNA]:
         return "L1"
     else:
-        return "L2"
+        raise Exception("Bad dataset name")
 
 
 def get_num_data_list(dataset):
@@ -49,56 +50,139 @@ def get_num_data_list(dataset):
         num_data = 50000
     elif dataset == NEWSGROUPS:
         num_data = 50000
-    else:
+    elif dataset == SCRNA:
         num_data = 40000
+    else:
+        raise Exception("Bad dataset name")
 
     return np.linspace(10000, num_data, 4, dtype=int)
 
 
 def run_scaling_experiment_with_k():
     """
-    Runs scaling experiments varying the number of medoids (k) for the MNIST
-    and CIFAR datasets using all BanditPAM algorithms.
+    Runs scaling experiments varying the number of medoids k for all datasets using all BanditPAM algorithms.
     """
-    # for dataset in [MNIST, CIFAR]: TODO uncomment this!
-    for dataset in [MNIST]:
+
+    for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
             loss=loss,
             algorithms=ALL_BANDITPAMS,
-            n_medoids_list=[5, 10, 15],
-            dirname="scrna_scaling_with_k",
-            cache_width=50000,
+            n_medoids_list=K_LIST,
+            cache_width=40000,
+            parallelize=False,
+            n_swaps=1,
         )
 
 
-def run_scaling_experiment_with_n():
+def run_build_only():
     """
     Runs scaling experiments varying the number of data points (n) for the
     provided datasets using all BanditPAM algorithms.
     """
-    # TODO: run loop through all datasets
-    for dataset in [CIFAR]:
+    for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         num_data_list = get_num_data_list(dataset)
-        for n_medoids in [15]:
-            np.random.seed(1)
+        parallelize = dataset != SCRNA
+
+        if dataset == MNIST:
+            swap_confidence = 30
+        elif dataset == CIFAR:
+            swap_confidence = 30
+        elif dataset == SCRNA:
+            swap_confidence = 15
+
+        for n_medoids in K_LIST:
+            np.random.seed(0)
             scaling_experiment_with_n(
                 dataset_name=dataset,
                 loss=loss,
-                algorithms=[BANDITPAM_ORIGINAL_NO_CACHING, BANDITPAM_VA_CACHING],
+                algorithms=ALL_BANDITPAMS,
                 n_medoids=n_medoids,
                 num_data_list=num_data_list,
-                dirname=f"{dataset}_k15_build",
-                num_experiments=1,  # TODO: used to be 10
-                parallelize=True,
-                cache_width=50000,
-                verbose=False,
+                dirname="build_only",
+                num_experiments=3,
+                parallelize=parallelize,
+                n_swaps=0,
+                save_loss_history=False,
+                cache_width=num_data_list[-1],
+                swap_confidence=swap_confidence,
             )
 
 
+def run_speedup_summary_table():
+    """
+    Runs scaling experiments varying the number of data points (n) for the
+    MNIST and CIFAR datasets using all BanditPAM algorithms.
+    """
+    for dataset in [
+        MNIST,
+        CIFAR,
+        SCRNA,
+    ]:
+        loss = get_loss_function(dataset)
+        num_data_list = get_num_data_list(dataset)
+        parallelize = dataset != SCRNA
+
+        if dataset == MNIST:
+            swap_confidence = 30
+        elif dataset == CIFAR:
+            swap_confidence = 30
+        elif dataset == SCRNA:
+            swap_confidence = 30
+
+        for n_medoids in K_LIST:
+            for algorithm in ALL_BANDITPAMS:
+                np.random.seed(0)
+                scaling_experiment_with_n(
+                    dataset_name=dataset,
+                    loss=loss,
+                    algorithms=[algorithm],
+                    n_medoids=n_medoids,
+                    num_data_list=num_data_list,
+                    dirname="summary_all_better_speedup",
+                    num_experiments=1,
+                    parallelize=parallelize,
+                    n_swaps=5,
+                    save_loss_history=False,
+                    cache_width=num_data_list[-1],
+                    build_confidence=3,
+                    swap_confidence=swap_confidence,
+                )
+
+
+def run_swap_vs_loss():
+    """
+    Runs scaling experiments varying the number of data points (n) for the
+    MNIST and CIFAR datasets using all BanditPAM algorithms.
+
+    TODO: If the algorithms use the num swaps less than 10, just interpolate them and take an average
+    """
+    for dataset in [MNIST, CIFAR]:
+        loss = get_loss_function(dataset)
+        num_data_list = get_num_data_list(dataset)
+        for n_medoids in [5, 10]:
+            np.random.seed(0)
+            scaling_experiment_with_n(
+                dataset_name=dataset,
+                loss=loss,
+                algorithms=ALL_BANDITPAMS,
+                n_medoids=n_medoids,
+                num_data_list=num_data_list,
+                dirname="swap_vs_loss",
+                num_experiments=3,
+                parallelize=False,
+                n_swaps=10,
+                build_confidence=3,
+                swap_confidence=5,
+            )
+
 def run_debug_scrna():
+    """
+    Used to debug the weird results we got on scRNA dataset when using parallelization.
+
+    """
     for dataset in [SCRNA]:
         loss = get_loss_function(dataset)
         num_data_list = [3000]
@@ -123,5 +207,7 @@ def run_debug_scrna():
 
 
 if __name__ == "__main__":
-    #run_scaling_experiment_with_k()
-    run_scaling_experiment_with_n()
+    run_scaling_experiment_with_k()
+    run_build_only()
+    run_swap_vs_loss()
+    run_speedup_summary_table()

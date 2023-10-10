@@ -7,13 +7,17 @@ FASTPAM = "FastPAM1"
 ALL_BANDITPAMS = [
     BANDITPAM_ORIGINAL_NO_CACHING,
     BANDITPAM_ORIGINAL_CACHING,
-    BANDITPAM_VA_CACHING,
     BANDITPAM_VA_NO_CACHING,
+    BANDITPAM_VA_CACHING,
 ]
 
+# Graph
 NUM_DATA = "num_data"
 NUM_MEDOIDS = "num_medoids"
 VAR_DELTA = "delta"
+NUM_SWAPS = "num_swaps"
+
+K_LIST = [5, 10, 15]
 
 MNIST = "MNIST"
 SCRNA = "SCRNA"
@@ -43,3 +47,4 @@ SWAP_CONFIDENCE_ARR = [2, 3, 5, 10]
 
 # 20newsgroups dataset size
 NEWSGROUPS_NUM_DATA = 10000
+LOSS_HISTORY = "loss_history"

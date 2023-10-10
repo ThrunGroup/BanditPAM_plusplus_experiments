@@ -77,6 +77,13 @@ class KMedoids {
   arma::urowvec getLabels() const;
 
   /**
+   * @brief Returns the losses of every build and swap step
+   *
+   * @returns Losses for each step
+   */
+  std::vector<float> getLossHistory() const;
+
+  /**
    * @brief Returns the number of SWAP steps performed.
    *
    * @returns Number of swap steps performed
@@ -492,6 +499,9 @@ class KMedoids {
 
   /// Indices of the medoids after clustering
   arma::urowvec medoidIndicesFinal;
+
+  /// Losses after BUILD and each SWAP step
+  std::vector<float> loss_history;
 
   /// Function pointer to the loss function to use
   float (KMedoids::*lossFn)(
