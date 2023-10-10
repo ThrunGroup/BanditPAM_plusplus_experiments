@@ -9,12 +9,14 @@ from constants import (
     MNIST,
     SCRNA,
     CIFAR,
+    NEWSGROUPS,
     # algorithms
     BANDITPAM_ORIGINAL_NO_CACHING,
     BANDITPAM_VA_CACHING,
     ALL_BANDITPAMS,
     # experiment settings
     NUM_DATA,
+    VAR_DELTA,
     NUM_MEDOIDS,
     NUM_SWAPS,
     RUNTIME,
@@ -37,6 +39,7 @@ def translate_experiment_setting(dataset, setting, num_seeds):
     """
     Translate a setting into a human-readable format For example, "k5" becomes
     "Num medoids: 5".
+    TODO: removed seed in title
     """
     if dataset in [CIFAR, SCRNA]:
         loss = "L1"
@@ -62,12 +65,14 @@ def translate_experiment_setting(dataset, setting, num_seeds):
 def get_x_label(x_axis, is_logspace_x):
     if x_axis == NUM_DATA:
         x_label = "Dataset size ($n$)"
+    elif x_axis == VAR_DELTA:
+        x_label = "Delta"
     elif x_axis == NUM_MEDOIDS:
         x_label = "Number of medoids ($k$)"
     elif x_axis == NUM_SWAPS:
         x_label = "Number of swaps ($T$)"
     else:
-        assert False
+        raise Exception("Bad x label")
 
     if is_logspace_x:
         x_label = f"ln({x_label})"
@@ -163,7 +168,6 @@ def get_titles(x_axis, y_axis, y_label, dataset, setting, num_seeds):
         f"{y_title} vs. {x_title} "
         f"{translate_experiment_setting(dataset, setting, num_seeds)}"
     )
-
     return x_title, y_title, title
 
 
@@ -200,11 +204,14 @@ def create_scaling_plots(
         # get log csv files
         if dir_name is None:
             parent_dir = os.path.dirname(os.path.abspath(__file__))
-            log_dir_name = (
-                "scaling_with_n_cluster"
-                if x_axis == NUM_DATA
-                else "scaling_with_k_cluster"
-            )
+
+            if x_axis == VAR_DELTA:
+                log_dir_name = "varying_delta"
+            elif x_axis == NUM_DATA:
+                log_dir_name = "scaling_with_n_cluster"
+            else:
+                log_dir_name = "scaling_with_k_cluster"
+
             log_dir = os.path.join(parent_dir, "logs", log_dir_name)
         else:
             root_dir = os.path.dirname(
@@ -308,11 +315,23 @@ def create_scaling_plots(
 
 
 if __name__ == "__main__":
+    # This is for scaling with k on newsgroups
+    # create_scaling_plots(
+    #     datasets=[NEWSGROUPS],
+    #     algorithms=[ALL_BANDITPAMS],
+    #     x_axes=[NUM_MEDOIDS],
+    #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name='20newsgroups',
+    #     include_error_bar=True,
+    # )
+    #
+    # this is for scaling with n on newsgroups
     create_scaling_plots(
         datasets=[SCRNA],
         algorithms=ALL_BANDITPAMS,
         x_axes=[NUM_MEDOIDS],
-        y_axes=[RUNTIME],
+        y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
         is_logspace_y=False,
         dir_name="scrna_scaling_with_k_conf15_cache10k",
         include_error_bar=True,

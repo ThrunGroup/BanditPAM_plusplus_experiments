@@ -14,6 +14,7 @@ ALL_BANDITPAMS = [
 # Graph
 NUM_DATA = "num_data"
 NUM_MEDOIDS = "num_medoids"
+VAR_DELTA = "delta"
 NUM_SWAPS = "num_swaps"
 
 K_LIST = [5, 10, 15]
@@ -21,6 +22,7 @@ K_LIST = [5, 10, 15]
 MNIST = "MNIST"
 SCRNA = "SCRNA"
 CIFAR = "CIFAR"
+NEWSGROUPS = "NEWSGROUPS"
 
 ALG_TO_COLOR = {
     BANDITPAM_ORIGINAL_NO_CACHING: "#8AB6D6",
@@ -39,4 +41,10 @@ ALG_TO_LABEL = {
 SAMPLE_COMPLEXITY = "Sample Complexity"
 RUNTIME = "total_runtime"
 LOSS = "loss"
+
+# varying delta corresponds to varying confidence intervals
+SWAP_CONFIDENCE_ARR = [2, 3, 5, 10]
+
+# 20newsgroups dataset size
+NEWSGROUPS_NUM_DATA = 10000
 LOSS_HISTORY = "loss_history"

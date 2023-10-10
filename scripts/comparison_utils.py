@@ -48,7 +48,6 @@ def print_results(kmed, runtime, build_only_time):
     print("Total runtime:", runtime)
     print("Losses: ", interpolated_loss_history)
 
-
 def get_loss_history_log_dict(kmed, num_data, num_medoids):
     # Create a dictionary with the printed values
     loss_history = kmed.losses

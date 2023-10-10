@@ -15,9 +15,9 @@ def run_algorithm(
     data,
     n_medoids,
     loss,
-    cache_width=2000,
+    cache_width=50000,   # TODO: perhaps change to 10000 for speedup?
     parallelize=True,
-    n_swaps=100,
+    n_swaps=10,  # NOTE: this used to be 100, but loss p much converges at 10..
     build_confidence=10,
     swap_confidence=6,
 ):

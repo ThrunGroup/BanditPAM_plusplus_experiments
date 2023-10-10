@@ -5,10 +5,13 @@ from scipy.spatial import distance_matrix
 
 from run_all_versions import run_algorithm
 from scripts.comparison_utils import print_results, store_results
+from data.newsgroups_to_csv import twenty_newsgroup_to_csv
 from scripts.constants import (
     # Datasets
     MNIST,
     CIFAR,
+    NEWSGROUPS,
+    # Algorithms
     BANDITPAM_ORIGINAL_NO_CACHING,
     BANDITPAM_VA_CACHING,
 )
@@ -27,6 +30,12 @@ def read_dataset(dataset_name):
     elif dataset_name == CIFAR:
         filename = "cifar10"
         delimiter = ","
+    elif dataset_name == NEWSGROUPS:
+        filename = "20_newsgroups"
+        delimiter = ","
+        if not os.path.exists(os.path.join("data", f"{filename}.csv")):
+            print("processing newsgroups dataset")
+            twenty_newsgroup_to_csv()
     else:
         filename = "reduced_scrna"
         delimiter = ","
@@ -36,6 +45,9 @@ def read_dataset(dataset_name):
         delimiter=delimiter,
         header=None,
     ).to_numpy()
+
+    if dataset_name == NEWSGROUPS:
+        dataset = dataset[1:, 1:]
 
     print(dataset.shape)
     return dataset
@@ -310,7 +322,8 @@ def debug(
                 banditpam_build_medoids = data[kmed.medoids, :]
 
                 banditpam_medoids_ref_cost_distance_matrix = distance_matrix(
-                    banditpam_build_medoids, data
+                    banditpam_build_medoids,
+                    data
                 )
                 banditpam_objective = np.sum(
                     np.min(banditpam_medoids_ref_cost_distance_matrix, 0)

@@ -13,6 +13,7 @@ def load_cifar_batch(file):
     return dict
 
 
+
 if __name__ == "__main__":
     # Define the directory where the data batches are stored.
     # Assumes we are being run from the /data directory

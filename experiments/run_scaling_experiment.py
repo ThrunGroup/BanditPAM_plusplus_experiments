@@ -13,6 +13,7 @@ from scripts.constants import (
     MNIST,
     CIFAR,
     SCRNA,
+    NEWSGROUPS,
     # Parameters
     K_LIST,
 )
@@ -23,9 +24,11 @@ def get_loss_function(dataset):
     Returns the appropriate loss function based on the dataset.
 
     :param dataset: A string that represents the name of the dataset
-    :return: A string indicating the type of loss function ("L1" or "L2")
+    :return: A string indicating the type of loss function 
     """
-    if dataset in [MNIST]:
+    if dataset in [NEWSGROUPS]:
+        return "cos"
+    elif dataset in [MNIST]:
         return "L2"
     elif dataset in [CIFAR, SCRNA]:
         return "L1"
@@ -45,6 +48,8 @@ def get_num_data_list(dataset):
         num_data = 70000
     elif dataset == CIFAR:
         num_data = 50000
+    elif dataset == NEWSGROUPS:
+        num_data = 50000
     elif dataset == SCRNA:
         num_data = 40000
     else:
@@ -57,6 +62,7 @@ def run_scaling_experiment_with_k():
     """
     Runs scaling experiments varying the number of medoids k for all datasets using all BanditPAM algorithms.
     """
+
     for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
@@ -73,9 +79,8 @@ def run_scaling_experiment_with_k():
 def run_build_only():
     """
     Runs scaling experiments varying the number of data points (n) for the
-    MNIST and CIFAR datasets using all BanditPAM algorithms.
+    provided datasets using all BanditPAM algorithms.
     """
-
     for dataset in [MNIST, CIFAR, SCRNA]:
         loss = get_loss_function(dataset)
         num_data_list = get_num_data_list(dataset)
