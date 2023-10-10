@@ -13,6 +13,8 @@ from scripts.constants import (
     MNIST,
     CIFAR,
     SCRNA,
+    # Parameters
+    K_LIST,
 )
 
 
@@ -61,7 +63,7 @@ def run_scaling_experiment_with_k():
             dataset_name=dataset,
             loss=loss,
             algorithms=ALL_BANDITPAMS,
-            n_medoids_list=[15],
+            n_medoids_list=K_LIST,
             cache_width=40000,
             parallelize=False,
             n_swaps=1,
@@ -86,7 +88,7 @@ def run_build_only():
         elif dataset == SCRNA:
             swap_confidence = 15
 
-        for n_medoids in [15]:
+        for n_medoids in K_LIST:
             np.random.seed(0)
             scaling_experiment_with_n(
                 dataset_name=dataset,
@@ -125,7 +127,7 @@ def run_speedup_summary_table():
         elif dataset == SCRNA:
             swap_confidence = 30
 
-        for n_medoids in [10, 15]:
+        for n_medoids in K_LIST:
             for algorithm in ALL_BANDITPAMS:
                 np.random.seed(0)
                 scaling_experiment_with_n(

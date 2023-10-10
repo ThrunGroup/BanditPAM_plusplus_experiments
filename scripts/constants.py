@@ -16,6 +16,8 @@ NUM_DATA = "num_data"
 NUM_MEDOIDS = "num_medoids"
 NUM_SWAPS = "num_swaps"
 
+K_LIST = [5, 10, 15]
+
 MNIST = "MNIST"
 SCRNA = "SCRNA"
 CIFAR = "CIFAR"
