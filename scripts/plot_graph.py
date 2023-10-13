@@ -327,15 +327,15 @@ if __name__ == "__main__":
     # )
     #
     # this is for scaling with n on newsgroups
-    create_scaling_plots(
-        datasets=[SCRNA],
-        algorithms=ALL_BANDITPAMS,
-        x_axes=[NUM_MEDOIDS],
-        y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
-        is_logspace_y=False,
-        dir_name="scrna_scaling_with_k_conf15_cache10k",
-        include_error_bar=True,
-    )
+    # create_scaling_plots(
+    #     datasets=[SCRNA],
+    #     algorithms=ALL_BANDITPAMS,
+    #     x_axes=[NUM_MEDOIDS],
+    #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
+    #     is_logspace_y=False,
+    #     dir_name="scrna_scaling_with_k_conf15_cache10k",
+    #     include_error_bar=True,
+    # )
 
     # create_scaling_plots(
     #     datasets=[SCRNA],

@@ -114,9 +114,9 @@ def store_results(
             if kmed.steps == 0
             else (runtime - build_only_time) / kmed.steps,
             "total_runtime": runtime,
-            # "loss_history": interpolated_loss_history
-            # if save_loss_history
-            # else "",
+            "loss_history": interpolated_loss_history
+            if save_loss_history
+            else "",
         }
     ]
 

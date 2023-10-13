@@ -63,7 +63,8 @@ def run_scaling_experiment_with_k():
     Runs scaling experiments varying the number of medoids k for all datasets using all BanditPAM algorithms.
     """
 
-    for dataset in [MNIST, CIFAR, SCRNA]:
+    for dataset in [MNIST, CIFAR, SCRNA, NEWSGROUPS]:
+        parallelize = dataset != SCRNA
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
@@ -71,8 +72,8 @@ def run_scaling_experiment_with_k():
             algorithms=ALL_BANDITPAMS,
             n_medoids_list=K_LIST,
             cache_width=40000,
-            parallelize=False,
-            n_swaps=1,
+            parallelize=parallelize,
+            n_swaps=3,
         )
 
 
@@ -120,6 +121,7 @@ def run_speedup_summary_table():
         MNIST,
         CIFAR,
         SCRNA,
+        NEWSGROUPS,
     ]:
         loss = get_loss_function(dataset)
         num_data_list = get_num_data_list(dataset)
@@ -134,15 +136,15 @@ def run_speedup_summary_table():
 
         for n_medoids in K_LIST:
             for algorithm in ALL_BANDITPAMS:
-                np.random.seed(0)
+                np.random.seed(1)
                 scaling_experiment_with_n(
                     dataset_name=dataset,
                     loss=loss,
                     algorithms=[algorithm],
                     n_medoids=n_medoids,
                     num_data_list=num_data_list,
-                    dirname="summary_all_better_speedup",
-                    num_experiments=1,
+                    dirname="speedup_summary",
+                    num_experiments=3,
                     parallelize=parallelize,
                     n_swaps=5,
                     save_loss_history=False,
@@ -173,9 +175,10 @@ def run_swap_vs_loss():
                 dirname="swap_vs_loss",
                 num_experiments=3,
                 parallelize=False,
-                n_swaps=10,
+                n_swaps=5,
                 build_confidence=3,
                 swap_confidence=5,
+                save_loss_history=True,
             )
 
 def run_debug_scrna():

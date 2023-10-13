@@ -11,8 +11,7 @@ from scripts.constants import (
     CIFAR,
     NEWSGROUPS,
     # Algorithms
-    BANDITPAM_ORIGINAL_NO_CACHING,
-    BANDITPAM_VA_CACHING,
+    ALL_BANDITPAMS,
 )
 
 
@@ -53,7 +52,7 @@ def scaling_experiment_with_k(
     dataset_name,
     n_medoids_list=None,
     num_data=10000,
-    algorithms=None,
+    algorithms=ALL_BANDITPAMS,
     loss: str = "L2",
     verbose=True,
     save_logs=True,
@@ -102,19 +101,20 @@ def scaling_experiment_with_k(
                     f"_idx{experiment_index}"
                 )
 
-                if "with" in algorithm:
-                    algorithm_name = BANDITPAM_VA_CACHING
-                else:
-                    algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
+                # if "with" in algorithm:
+                #     algorithm_name = BANDITPAM_VA_CACHING
+                # else:
+                #     algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
 
-                build_only_csv = pd.read_csv(
-                    os.path.join(
-                        "logs",
-                        "build_only_all",
-                        f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",  # TODO(@motiwari): should this be {experiment_index}?
-                    )
-                )
-                build_only_time = build_only_csv["total_runtime"][0]
+                # build_only_csv = pd.read_csv(
+                #     os.path.join(
+                #         "logs",
+                #         "build_only_all",
+                #         f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",  # TODO(@motiwari): should this be {experiment_index}?
+                #     )
+                # )
+                # build_only_time = build_only_csv["total_runtime"][0]
+                build_only_time = 0
 
                 kmed, runtime = run_algorithm(
                     algorithm,
@@ -147,7 +147,7 @@ def scaling_experiment_with_n(
     dataset_name,
     num_data_list,
     n_medoids,
-    algorithms=None,
+    algorithms=ALL_BANDITPAMS,
     loss: str = "L2",
     verbose=True,
     save_logs=True,
@@ -158,7 +158,7 @@ def scaling_experiment_with_n(
     n_swaps=10,
     build_confidence=3,
     swap_confidence=10,
-    save_loss_history=True,
+    save_loss_history=False,
     num_data_indices=[0, 1, 2, 3],
 ):
     """
@@ -185,7 +185,7 @@ def scaling_experiment_with_n(
 
     print("Running sampling complexity experiment with n on ", dataset_name)
 
-    for experiment_index in range(num_experiments):
+    for experiment_index in range(2, 2+num_experiments):
         print("\n\nExperiment: ", experiment_index)
         for num_data_index in num_data_indices:
             num_data = num_data_list[num_data_index]
@@ -201,24 +201,24 @@ def scaling_experiment_with_n(
                     f"_idx{experiment_index}"
                 )
                 print(log_name)
-
-                if n_swaps == 0:
-                    build_only_time = 0
-                else:
-                    if "with" in algorithm:
-                        algorithm_name = BANDITPAM_VA_CACHING
-                    else:
-                        algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
-                    build_only_csv = pd.read_csv(
-                        os.path.join(
-                            "logs",
-                            "build_only_all",
-                            f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",
-                        )
-                    )
-                    build_only_time = build_only_csv["total_runtime"][
-                        num_data_index
-                    ]
+                build_only_time = 0
+                # if n_swaps == 0:
+                #     build_only_time = 0
+                # else:
+                #     if "with" in algorithm:
+                #         algorithm_name = BANDITPAM_VA_CACHING
+                #     else:
+                #         algorithm_name = BANDITPAM_ORIGINAL_NO_CACHING
+                #     build_only_csv = pd.read_csv(
+                #         os.path.join(
+                #             "logs",
+                #             "build_only",
+                #             f"{algorithm_name}_{dataset_name}_k{n_medoids}_idx0.csv",
+                #         )
+                #     )
+                #     build_only_time = build_only_csv["total_runtime"][
+                #         num_data_index
+                #     ]
 
                 kmed, runtime = run_algorithm(
                     algorithm,
