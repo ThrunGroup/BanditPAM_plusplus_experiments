@@ -8,7 +8,9 @@ from experiments.scaling_experiment import (
 from scripts.constants import (
     # Algorithms
     ALL_BANDITPAMS,
-    BANDITPAM_VA_NO_CACHING,
+    # BANDITPAM_VA_NO_CACHING,
+    BANDITPAM_ORIGINAL_CACHING,
+    BANDITPAM_VA_CACHING,
     # Datasets
     MNIST,
     CIFAR,
@@ -24,7 +26,7 @@ def get_loss_function(dataset):
     Returns the appropriate loss function based on the dataset.
 
     :param dataset: A string that represents the name of the dataset
-    :return: A string indicating the type of loss function 
+    :return: A string indicating the type of loss function
     """
     if dataset in [NEWSGROUPS]:
         return "cos"
@@ -63,17 +65,24 @@ def run_scaling_experiment_with_k():
     Runs scaling experiments varying the number of medoids k for all datasets using all BanditPAM algorithms.
     """
 
-    for dataset in [MNIST, CIFAR, SCRNA, NEWSGROUPS]:
-        parallelize = dataset != SCRNA
+    # for dataset in [MNIST, CIFAR, SCRNA, NEWSGROUPS]:
+    for dataset in [MNIST]:
+        parallelize = False
         loss = get_loss_function(dataset)
         scaling_experiment_with_k(
             dataset_name=dataset,
             loss=loss,
             algorithms=ALL_BANDITPAMS,
+            # algorithms=[
+            #     BANDITPAM_ORIGINAL_CACHING,
+            #     BANDITPAM_VA_CACHING,
+            # ],
             n_medoids_list=K_LIST,
-            cache_width=40000,
+            cache_width=20000,
             parallelize=parallelize,
+            num_experiments=1,
             n_swaps=3,
+            dirname="scaling_with_k_no_parallelize",
         )
 
 
@@ -180,6 +189,7 @@ def run_swap_vs_loss():
                 swap_confidence=5,
                 save_loss_history=True,
             )
+
 
 def run_debug_scrna():
     """

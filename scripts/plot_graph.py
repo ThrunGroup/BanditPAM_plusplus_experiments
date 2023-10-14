@@ -109,14 +109,14 @@ def get_y_label(y_axis, is_logspace_y):
 
 
 def get_y_and_error(
-        y_axis,
-        data_mean,
-        data_std,
-        algorithm,
-        is_logspace_y,
-        num_experiments,
-        baseline_losses=1.0,
-        bpam_loss_history=None,
+    y_axis,
+    data_mean,
+    data_std,
+    algorithm,
+    is_logspace_y,
+    num_experiments,
+    baseline_losses=1.0,
+    bpam_loss_history=None,
 ):
     if y_axis is LOSS:
         # Plot the loss divided by that of
@@ -172,15 +172,15 @@ def get_titles(x_axis, y_axis, y_label, dataset, setting, num_seeds):
 
 
 def create_scaling_plots(
-        datasets: List[str] = [],
-        algorithms: List[str] = [],
-        x_axes=NUM_DATA,
-        y_axes=RUNTIME,
-        is_logspace_x: bool = False,
-        is_logspace_y: bool = False,
-        include_error_bar: bool = False,
-        dir_name: str = None,
-        settings: List[str] = None,
+    datasets: List[str] = [],
+    algorithms: List[str] = [],
+    x_axes=NUM_DATA,
+    y_axes=RUNTIME,
+    is_logspace_x: bool = False,
+    is_logspace_y: bool = False,
+    include_error_bar: bool = False,
+    dir_name: str = None,
+    settings: List[str] = None,
 ):
     """
     Plot the scaling experiments from the data stored in the logs file.
@@ -316,37 +316,15 @@ def create_scaling_plots(
 
 if __name__ == "__main__":
     # This is for scaling with k on newsgroups
-    # create_scaling_plots(
-    #     datasets=[NEWSGROUPS],
-    #     algorithms=[ALL_BANDITPAMS],
-    #     x_axes=[NUM_MEDOIDS],
-    #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
-    #     is_logspace_y=False,
-    #     dir_name='20newsgroups',
-    #     include_error_bar=True,
-    # )
-    #
-    # this is for scaling with n on newsgroups
-    # create_scaling_plots(
-    #     datasets=[SCRNA],
-    #     algorithms=ALL_BANDITPAMS,
-    #     x_axes=[NUM_MEDOIDS],
-    #     y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
-    #     is_logspace_y=False,
-    #     dir_name="scrna_scaling_with_k_conf15_cache10k",
-    #     include_error_bar=True,
-    # )
-
-    # create_scaling_plots(
-    #     datasets=[SCRNA],
-    #     algorithms=ALL_BANDITPAMS,
-    #     x_axes=[NUM_MEDOIDS],
-    #     y_axes=[RUNTIME],
-    #     is_logspace_y=False,
-    #     dir_name="scrna_scaling_with_k_7",
-    #     include_error_bar=False,
-    #     # settings=["k5"],
-    # )
+    create_scaling_plots(
+        datasets=[NEWSGROUPS],
+        algorithms=ALL_BANDITPAMS,
+        x_axes=[NUM_MEDOIDS],
+        y_axes=[SAMPLE_COMPLEXITY, RUNTIME],
+        is_logspace_y=False,
+        dir_name="scaling_with_k",
+        include_error_bar=True,
+    )
 
     # create_scaling_plots(
     #     datasets=[MNIST, CIFAR],
