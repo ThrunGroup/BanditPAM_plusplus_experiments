@@ -15,6 +15,10 @@
 #include "kmedoids_pywrapper.hpp"
 
 namespace km {
+  float km::KMedoidsWrapper::getBuildLossPython() {
+    return KMedoids::getBuildLoss();
+  }
+
   float km::KMedoidsWrapper::getLossPython() {
     return KMedoids::getAverageLoss();
   }
@@ -23,18 +27,14 @@ namespace km {
     return KMedoids::getLossHistory();
   }
 
-  float km::KMedoidsWrapper::getBuildLossPython() {
-    return KMedoids::getBuildLoss();
+  void build_loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
+    cls->def_property_readonly("build_loss",
+                               &KMedoidsWrapper::getBuildLossPython);
   }
 
   void loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
     cls->def_property_readonly("average_loss",
                                &KMedoidsWrapper::getLossPython);
-  }
-
-  void build_loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
-    cls->def_property_readonly("build_loss",
-                               &KMedoidsWrapper::getBuildLossPython);
   }
 
   void loss_history_python(pybind11::class_ <KMedoidsWrapper> *cls) {

@@ -214,6 +214,11 @@ class KMedoidsWrapper : public km::KMedoids {
   void cache_misses_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
 
   /**
+  * @brief Binding for the C++ function KMedoids::getTotalBuildTime()
+  */
+  void total_build_time(pybind11::class_ <km::KMedoidsWrapper> *cls);
+
+  /**
   * @brief Binding for the C++ function KMedoids::getTotalSwapTime()
   */
   void total_swap_time_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
@@ -222,5 +227,10 @@ class KMedoidsWrapper : public km::KMedoids {
   * @brief Binding for the C++ function KMedoids::getTimePerSwap()
   */
   void time_per_swap_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
+
+  /**
+  * @brief Binding for the C++ function KMedoids::getTotalTime()
+  */
+  void total_time(pybind11::class_ <km::KMedoidsWrapper> *cls);
 }  // namespace km
 #endif  // HEADERS_PYTHON_BINDINGS_KMEDOIDS_PYWRAPPER_HPP_

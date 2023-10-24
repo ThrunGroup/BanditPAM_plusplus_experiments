@@ -13,12 +13,27 @@
 #include "kmedoids_pywrapper.hpp"
 
 namespace km {
+
+  size_t km::KMedoidsWrapper::getBuildTimePython() {
+    return KMedoids::getBuildTime();
+  }
+
   size_t km::KMedoidsWrapper::getTotalSwapTimePython() {
     return KMedoids::getTotalSwapTime();
   }
 
-  float km::KMedoidsWrapper::getTimePerSwapPython() {
+  size_t km::KMedoidsWrapper::getTimePerSwapPython() {
     return KMedoids::getTimePerSwap();
+  }
+
+  size_t km::KMedoidsWrapper::getTotalTimePython() {
+    return KMedoids::getTotalTime();
+  }
+
+  void total_build_time(pybind11::class_ <km::KMedoidsWrapper> *cls) {
+    cls->def_property_readonly(
+            "total_build_time",
+            &KMedoidsWrapper::getTotalBuildTimePython);
   }
 
   void total_swap_time_python(pybind11::class_ <km::KMedoidsWrapper> *cls) {
@@ -31,5 +46,11 @@ namespace km {
     cls->def_property_readonly(
             "time_per_swap",
             &KMedoidsWrapper::getTimePerSwapPython);
+  }
+
+  void total_time(pybind11::class_ <km::KMedoidsWrapper> *cls) {
+    cls->def_property_readonly(
+            "total_time",
+            &KMedoidsWrapper::getTotalTimePython);
   }
 }  // namespace km

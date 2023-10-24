@@ -19,8 +19,6 @@ namespace km {
           std::optional<std::reference_wrapper<const arma::fmat>> distMat) {
     data = arma::trans(inputData);
 
-    arma::arma_rng::set_seed(0);
-
     // Note: even if we are using a distance matrix,
     // we compute the permutation
     // in the block below because it is used elsewhere in the call stack
@@ -47,13 +45,14 @@ namespace km {
 
     arma::fmat medoidMatrix(data.n_rows, nMedoids);
     arma::urowvec medoidIndices(nMedoids);
-    steps = 0;
-    BanditPAM_orig::build(data, distMat, &medoidIndices, &medoidMatrix);
 
+    BanditPAM_orig::build(data, distMat, &medoidIndices, &medoidMatrix);
+    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
 
     if (nMedoids > 1) {
+      steps = 0;
       BanditPAM_orig::swap(
               data,
               distMat,
