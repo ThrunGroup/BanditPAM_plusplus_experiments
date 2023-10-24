@@ -12,6 +12,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <chrono>
 
 namespace km {
   void BanditPAM_orig::fitBanditPAM_orig(
@@ -19,6 +20,7 @@ namespace km {
           std::optional<std::reference_wrapper<const arma::fmat>> distMat) {
     data = arma::trans(inputData);
 
+    const auto start = std::chrono::system_clock::now();
     // Note: even if we are using a distance matrix,
     // we compute the permutation
     // in the block below because it is used elsewhere in the call stack
@@ -50,6 +52,7 @@ namespace km {
     buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
+    const auto build_end = std::chrono::system_clock::now();
 
     if (nMedoids > 1) {
       steps = 0;
@@ -63,6 +66,13 @@ namespace km {
 
     medoidIndicesFinal = medoidIndices;
     labels = assignments;
+    const auto swap_end = std::chrono::system_clock::now();
+
+    size_t start_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
+    size_t build_end_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(build_end.time_since_epoch()).count();
+    size_t swap_end_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(swap_end.time_since_epoch()).count();
+    totalBuildTime = build_end_size_t - start_size_t;
+    totalSwapTime = swap_end_size_t - build_end_size_t;
   }
 
   arma::frowvec BanditPAM_orig::buildSigma(

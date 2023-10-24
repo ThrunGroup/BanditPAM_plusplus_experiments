@@ -71,13 +71,13 @@ def run_exp(exp: dict) -> None:
         # Query the key statistics and log to file
         # TODO: Get results
         # TODO: Implement querying of key statistics in BanditPAM and BanditPAM++
+        # - BUILD sample complexity -- binding
+        # - SWAP sample complexity -- binding
+        # - Misc sample complexity -- binding
         # - Build Wall Clock Time - binding
         # - SWAP Wall Clock Time - binding
         # - Total Wall Clock Time - binding
         # - Number of swaps -- binding
-        # - BUILD sample complexity -- binding
-        # - SWAP sample complexity -- binding
-        # - Misc sample complexity -- binding
         # - Build Loss -- binding
         # - Final Loss -- binding
         # - Build medoids -- binding
