@@ -62,26 +62,27 @@ def run_exp(exp: dict) -> None:
 
         # Fit on the dataset, loss, and seed
         data = get_data(exp['dataset'], exp['n'], exp['seed'])
-        start = time.time()
         kmed.fit(data, exp['loss'])
-        end = time.time()
-        runtime = end - start
 
 
         # Query the key statistics and log to file
         # TODO: Get results
         # TODO: Implement querying of key statistics in BanditPAM and BanditPAM++
-        # - BUILD sample complexity -- binding
-        # - SWAP sample complexity -- binding
-        # - Misc sample complexity -- binding
         # - Build Wall Clock Time - done
-        # - SWAP Wall Clock Time - binding
-        # - Total Wall Clock Time - binding
-        # - Number of swaps -- binding
-        # - Build Loss -- binding
-        # - Final Loss -- binding
-        # - Build medoids -- binding
-        # - Final medoids -- binding
+        # - SWAP Wall Clock Time - done
+        # - Total Wall Clock Time - done
+        # - Number of swaps -- done
+        # - Build Loss -- done
+        # - Final Loss -- done
+        # - Build medoids -- done
+        # - Final medoids -- done
+
+        # - BUILD sample complexity -- done
+        # - SWAP sample complexity -- done
+        # - Misc sample complexity -- done
+
+
+
 
 
     else:

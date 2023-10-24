@@ -49,7 +49,6 @@ namespace km {
     arma::urowvec medoidIndices(nMedoids);
 
     BanditPAM_orig::build(data, distMat, &medoidIndices, &medoidMatrix);
-    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
     const auto build_end = std::chrono::system_clock::now();
@@ -107,10 +106,12 @@ namespace km {
     #pragma omp parallel for if (this->parallelize)
     for (size_t i = 0; i < N; i++) {
       for (size_t j = 0; j < batchSize; j++) {
-        // 0 for MISC
-        float cost =
-                KMedoids::cachedLoss(data, distMat, i,
-                                     referencePoints(j), 0);
+        float cost = KMedoids::cachedLoss(
+                        data,
+                        distMat,
+                        i,
+                        referencePoints(j),
+                        0); // 0 for MISC
         if (useAbsolute) {
           sample(j) = cost;
         } else {
@@ -336,9 +337,12 @@ namespace km {
       // calculate change in loss for some subset of the data
       for (size_t j = 0; j < batchSize; j++) {
         // 0 for MISC when estimating sigma
-        float cost =
-                KMedoids::cachedLoss(data, distMat, n,
-                                     referencePoints(j), 0);
+        float cost = KMedoids::cachedLoss(
+                        data,
+                        distMat,
+                        n,
+                        referencePoints(j),
+                        0);  // 0 for MISC
 
         if (k == (*assignments)(referencePoints(j))) {
           if (cost < (*secondBestDistances)(referencePoints(j))) {
@@ -406,10 +410,12 @@ namespace km {
       size_t k = (*targets)(i) % medoidIndices->n_cols;
       // calculate total loss for some subset of the data
       for (size_t j = 0; j < tmpBatchSize; j++) {
-        // 2 for SWAP
-        float cost =
-                KMedoids::cachedLoss(data, distMat, n,
-                                     referencePoints(j), 2);
+        float cost = KMedoids::cachedLoss(
+                        data,
+                        distMat,
+                        n,
+                        referencePoints(j),
+                        2);  // 2 for SWAP
         if (k == (*assignments)(referencePoints(j))) {
           if (cost < (*secondBestDistances)(referencePoints(j))) {
             total += cost;
@@ -547,7 +553,6 @@ namespace km {
       size_t k = newMedoid % medoids->n_cols;
       size_t n = newMedoid / medoids->n_cols;
       swapPerformed = (*medoidIndices)(k) != n;
-//      steps++;
 
       if (swapPerformed) {
         (*medoidIndices)(k) = n;
@@ -569,8 +574,8 @@ namespace km {
       }
       std::cout << std::endl;
 
-     float loss = KMedoids::calcLoss(data, distMat, medoidIndices);
-     loss_history.push_back(loss);
+     averageLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
+     loss_history.push_back(averageLoss);
      std::cout << "Loss: " << loss << std::endl;
     }
   }

@@ -324,10 +324,13 @@ namespace km {
       float best = std::numeric_limits<float>::infinity();
       float second = std::numeric_limits<float>::infinity();
       for (size_t k = 0; k < medoidIndices->n_cols; k++) {
-        // 0 for MISC
         float cost =
-                KMedoids::cachedLoss(data, distMat, i,
-                                     (*medoidIndices)(k), 0);
+                KMedoids::cachedLoss(
+                    data,
+                    distMat,
+                    i,
+                    (*medoidIndices)(k),
+                    0);  // 0 for MISC
         if (cost < best) {
           (*assignments)(i) = k;
           second = best;
@@ -381,22 +384,22 @@ namespace km {
           const size_t category,
           const bool useCacheFunctionOverride
   ) {
-    // TODO(@motiwari): Change category to an enum
-    if (category == 0) {  // MISC
-      numMiscDistanceComputations++;
-    } else if (category == 1) {  // BUILD
-      numBuildDistanceComputations++;
-    } else if (category == 2) {  // SWAP
-      numSwapDistanceComputations++;
-    } else {
-      // TODO(@motiwari): Throw exception
-    }
-
     if (this->useDistMat) {
       return distMat.value().get().at(i, j);
     }
 
     if (!useCache) {
+        // TODO(@motiwari): Change category to an enum
+        if (category == 0) {  // MISC
+          numMiscDistanceComputations++;
+        } else if (category == 1) {  // BUILD
+          numBuildDistanceComputations++;
+        } else if (category == 2) {  // SWAP
+          numSwapDistanceComputations++;
+        } else {
+          // TODO(@motiwari): Throw exception
+        }
+
       return (this->*lossFn)(data, i, j);
     }
 
@@ -410,6 +413,17 @@ namespace km {
       // T1 begins to write to cache and then T2
       // access in the middle of write?
       if (cache[(m * i) + reindex[j]] == -1) {
+        // TODO(@motiwari): Change category to an enum
+        if (category == 0) {  // MISC
+          numMiscDistanceComputations++;
+        } else if (category == 1) {  // BUILD
+          numBuildDistanceComputations++;
+        } else if (category == 2) {  // SWAP
+          numSwapDistanceComputations++;
+        } else {
+          // TODO(@motiwari): Throw exception
+        }
+
         // cache miss! calculate the distance and cache it.
         numCacheMisses++;
         numCacheWrites++;

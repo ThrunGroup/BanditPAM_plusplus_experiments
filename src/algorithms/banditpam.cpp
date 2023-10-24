@@ -51,7 +51,6 @@ namespace km {
     arma::urowvec medoidIndices(nMedoids);
 
     BanditPAM::build(data, distMat, &medoidIndices, &medoidMatrix);
-    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
     const auto build_end = std::chrono::system_clock::now();
@@ -111,8 +110,12 @@ namespace km {
       for (size_t j = 0; j < batchSize; j++) {
         // 0 for MISC
         float cost =
-                KMedoids::cachedLoss(data, distMat, i,
-                                     referencePoints(j), 0);
+                KMedoids::cachedLoss(
+                    data,
+                    distMat,
+                    i,
+                    referencePoints(j),
+                    0); // 0 for MISC
         if (useAbsolute) {
           sample(j) = cost;
         } else {
@@ -162,8 +165,7 @@ namespace km {
     for (size_t i = 0; i < target->n_rows; i++) {
         float total = 0;
       for (size_t j = 0; j < referencePoints.n_rows; j++) {
-          float cost =
-            KMedoids::cachedLoss(
+          float cost = KMedoids::cachedLoss(
                     data,
                     distMat,
                     (*target)(i),
@@ -339,8 +341,12 @@ namespace km {
       for (size_t j = 0; j < batchSize; j++) {
         // 0 for MISC when estimating sigma
         float cost =
-          KMedoids::cachedLoss(data, distMat, n,
-                               referencePoints(j), 0);
+          KMedoids::cachedLoss(
+            data,
+            distMat,
+            n,
+            referencePoints(j),
+            0);
 
         if (k == (*assignments)(referencePoints(j))) {
           if (cost < (*secondBestDistances)(referencePoints(j))) {
@@ -622,8 +628,8 @@ namespace km {
        }
        std::cout << std::endl;
 
-      float loss = KMedoids::calcLoss(data, distMat, medoidIndices);
-      loss_history.push_back(loss);
+      averageLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
+      loss_history.push_back(averageLoss);
       std::cout << "Loss: " << loss << std::endl;
     }
   }
