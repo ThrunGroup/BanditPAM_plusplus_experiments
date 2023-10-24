@@ -6,21 +6,22 @@ import banditpam
 from create_configs import get_exp_name
 
 
-# TODO: Implement get_data
 def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
     if dataset == "MNIST":
-        pass
+        data = np.loadtxt(os.path.join("..", "data", "MNIST_70k.csv"))
     elif dataset == "CIFAR":
-        pass
+        data = np.loadtxt(os.path.join("..", "data", "cifar10.csv"), delimiter=",")
     elif dataset == "SCRNA":
-        pass
+        data = np.loadtxt(os.path.join("..", "data", "reduced_scrna.csv"), delimiter=",")
     elif dataset == "NEWSGROUPS":
-        pass
+        data = np.loadtxt(os.path.join("..", "data", "20_newsgroups.csv"), delimiter=",", skiprows=1)  # Drop header
+        data = data[:, 1:]  # Skip the first column, which is the datapoint index
     else:
         raise Exception("Bad dataset")
 
     np.random.seed(seed)
-    return np.random.choice(dataset, size=n)
+    return np.random.choice(data, size=n)
+
 def run_exp(exp: dict) -> None:
     """
     Runs the given experiment.
@@ -46,7 +47,6 @@ def run_exp(exp: dict) -> None:
             algorithm = "BanditPAM_orig"
             use_cache = False
 
-        # TODO: Set random seed
         kmed = banditpam.KMedoids(
             n_medoids=exp['k'],
             algorithm=algorithm,
@@ -69,8 +69,20 @@ def run_exp(exp: dict) -> None:
 
 
         # Query the key statistics and log to file
-        # TODO: Log to file
+        # TODO: Get results
         # TODO: Implement querying of key statistics in BanditPAM and BanditPAM++
+        # - Build Wall Clock Time
+        # - SWAP Wall Clock Time
+        # - Total Wall Clock Time
+        # - Number of swaps
+        # - BUILD sample complexity
+        # - SWAP sample complexity
+        # - Misc sample complexity
+        # - Build Loss
+        # - Final Loss
+        # - Build medoids
+        # - Final medoids
+
 
     else:
         print(f"Already have results for {exp_name}...")
