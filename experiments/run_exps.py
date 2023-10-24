@@ -1,9 +1,8 @@
 import numpy as np
-import time
 import os
 
 import banditpam
-from create_configs import get_exp_name
+from create_configs import get_exp_name, get_exp_params_from_name
 
 
 def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
@@ -20,7 +19,7 @@ def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
         raise Exception("Bad dataset")
 
     np.random.seed(seed)
-    return np.random.choice(data, size=n)
+    return data[np.random.choice(len(data), size=n)]
 
 def run_exp(exp: dict) -> None:
     """
@@ -57,8 +56,9 @@ def run_exp(exp: dict) -> None:
             cache_width=exp['cache_width'],
             build_confidence=exp['build_confidence'],
             swap_confidence=exp['swap_confidence'],
-            seed=exp['seed'],
+
         )
+        kmed.seed = exp['seed']  # Not supported as a constructor argument. This calls setSeed().
 
         # Fit on the dataset, loss, and seed
         data = get_data(exp['dataset'], exp['n'], exp['seed'])
@@ -86,3 +86,13 @@ def run_exp(exp: dict) -> None:
     else:
         print(f"Already have results for {exp_name}...")
 
+def main():
+    with open("all_configs.csv", "r") as exp_file:
+        for line in exp_file:
+            print(line)
+            exp = get_exp_params_from_name(line.strip())
+            run_exp(exp)
+
+
+if __name__ == "__main__":
+    main()

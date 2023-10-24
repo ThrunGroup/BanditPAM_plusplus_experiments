@@ -36,11 +36,11 @@ def get_exp_params_from_name(exp_name: str) -> dict:
         'n': int(tokens[3]),
         'k': int(tokens[4]),
         'T': int(tokens[5]),
-        'cache_width': int(tokens[7]),
-        'build_confidence': int(tokens[8]),
-        'swap_confidence': int(tokens[9]),
-        'parallelize': str_to_bool(tokens[10]),
-        'seed': int(tokens[11]),
+        'cache_width': int(tokens[6]),
+        'build_confidence': int(tokens[7]),
+        'swap_confidence': int(tokens[8]),
+        'parallelize': str_to_bool(tokens[9]),
+        'seed': int(tokens[10]),
     }
 
 def generate_config():
