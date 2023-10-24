@@ -66,24 +66,22 @@ def run_exp(exp: dict) -> None:
 
 
         # Query the key statistics and log to file
-        # TODO: Get results
-        # TODO: Implement querying of key statistics in BanditPAM and BanditPAM++
-        # - Build Wall Clock Time - done
-        # - SWAP Wall Clock Time - done
-        # - Total Wall Clock Time - done
-        # - Number of swaps -- done
-        # - Build Loss -- done
-        # - Final Loss -- done
-        # - Build medoids -- done
-        # - Final medoids -- done
-
-        # - BUILD sample complexity -- done
-        # - SWAP sample complexity -- done
-        # - Misc sample complexity -- done
-
-
-
-
+        with open(os.path.join("logs", exp_name), "w+") as fout:
+            fout.write("Build distance comps: " + str(kmed.build_distance_computations) + "\n")
+            fout.write("Swap distance comps: " + str(kmed.swap_distance_computations) + "\n")
+            fout.write("Misc distance comps: " + str(kmed.misc_distance_computations) + "\n")
+            fout.write("Build + Swap distance comps: " + str(kmed.getDistanceComputations(False)) + "\n")
+            fout.write("Total distance comps: " + str(kmed.getDistanceComputations(True)) + "\n")
+            fout.write("Number of Steps: " + str(kmed.steps) + "\n")
+            fout.write("Total Build time: " + str(kmed.total_build_time) + "\n")
+            fout.write("Total Swap time: " + str(kmed.total_swap_time) + "\n")
+            fout.write("Time per swap: " + str(kmed.time_per_swap) + "\n")
+            fout.write("Total time: " + str(kmed.total_time) + "\n")
+            fout.write("Build loss: " + str(kmed.build_loss) + "\n")
+            fout.write("Final loss: " + str(kmed.average_loss) + "\n")
+            fout.write("Loss trajectory: " + str(kmed.losses) + "\n")
+            fout.write("Build medoids: " + str(kmed.build_medoids) + "\n")
+            fout.write("Final medoids: " + str(kmed.medoids) + "\n")
 
     else:
         print(f"Already have results for {exp_name}...")
