@@ -18,4 +18,3 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -fno-omit-frame-pointer -fsanitize=a
 # set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -Wextra -g -fno-omit-frame-pointer")
 
 add_subdirectory(src)
-π
