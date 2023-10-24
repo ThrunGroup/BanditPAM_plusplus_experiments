@@ -75,6 +75,7 @@ namespace km {
     size_t swap_end_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(swap_end.time_since_epoch()).count();
     totalBuildTime = build_end_size_t - start_size_t;
     totalSwapTime = swap_end_size_t - build_end_size_t;
+    totalTime = swap_end_size_t - start_size_t;
   }
 
   arma::frowvec BanditPAM::buildSigma(

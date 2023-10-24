@@ -74,7 +74,7 @@ def run_exp(exp: dict) -> None:
         # - BUILD sample complexity -- binding
         # - SWAP sample complexity -- binding
         # - Misc sample complexity -- binding
-        # - Build Wall Clock Time - binding
+        # - Build Wall Clock Time - done
         # - SWAP Wall Clock Time - binding
         # - Total Wall Clock Time - binding
         # - Number of swaps -- binding
