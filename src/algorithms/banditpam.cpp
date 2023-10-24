@@ -621,16 +621,8 @@ namespace km {
               assignments,
               swapPerformed);
 
-       std::cout << "Medoids: ";
-       arma::uword numElements = medoidIndices->n_elem;
-       for (arma::uword i = 0; i < numElements; i++) {
-            std::cout << (*medoidIndices)(i) << " ";
-       }
-       std::cout << std::endl;
-
       averageLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
       loss_history.push_back(averageLoss);
-      std::cout << "Loss: " << loss << std::endl;
     }
   }
 }  // namespace km
