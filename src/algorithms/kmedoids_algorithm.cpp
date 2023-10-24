@@ -220,6 +220,18 @@ namespace km {
     parallelize = newParallelize;
   }
 
+  size_t KMedoids::getBuildDistanceComputations() const {
+    return numBuildDistanceComputations;
+  }
+
+  size_t KMedoids::getSwapDistanceComputations() const {
+    return numSwapDistanceComputations;
+  }
+
+  size_t KMedoids::getMiscDistanceComputations() const {
+    return numMiscDistanceComputations;
+  }
+
   size_t KMedoids::getDistanceComputations(const bool includeMisc) const {
     if (includeMisc) {
       return numMiscDistanceComputations +
@@ -229,18 +241,6 @@ namespace km {
       return numBuildDistanceComputations +
              numSwapDistanceComputations;
     }
-  }
-
-  size_t KMedoids::getMiscDistanceComputations() const {
-    return numMiscDistanceComputations;
-  }
-
-  size_t KMedoids::getBuildDistanceComputations() const {
-    return numBuildDistanceComputations;
-  }
-
-  size_t KMedoids::getSwapDistanceComputations() const {
-    return numSwapDistanceComputations;
   }
 
   size_t KMedoids::getCacheWrites() const {
@@ -255,12 +255,20 @@ namespace km {
     return numCacheMisses;
   }
 
+  size_t KMedoids::getTotalBuildTime() const {
+    return totalBuildTime;
+  }
+
   size_t KMedoids::getTotalSwapTime() const {
     return totalSwapTime;
   }
 
-  float KMedoids::getTimePerSwap() const {
+  size_t KMedoids::getTimePerSwap() const {
     return totalSwapTime / steps;
+  }
+
+  size_t KMedoids::getTotalTime() const {
+    return totalTime;
   }
 
   void KMedoids::setLossFn(std::string loss) {

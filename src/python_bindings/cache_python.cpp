@@ -13,11 +13,6 @@
 #include "kmedoids_pywrapper.hpp"
 
 namespace km {
-  size_t km::KMedoidsWrapper::getDistanceComputationsPython(
-          const bool includeMisc) {
-    return KMedoids::getDistanceComputations(includeMisc);
-  }
-
   size_t km::KMedoidsWrapper::getBuildDistanceComputationsPython() {
     return KMedoids::getBuildDistanceComputations();
   }
@@ -28,6 +23,11 @@ namespace km {
 
   size_t km::KMedoidsWrapper::getMiscDistanceComputationsPython() {
     return KMedoids::getMiscDistanceComputations();
+  }
+
+  size_t km::KMedoidsWrapper::getDistanceComputationsPython(
+          const bool includeMisc) {
+    return KMedoids::getDistanceComputations(includeMisc);
   }
 
   size_t km::KMedoidsWrapper::getCacheWritesPython() {

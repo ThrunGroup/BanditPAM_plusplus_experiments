@@ -14,8 +14,8 @@
 
 namespace km {
 
-  size_t km::KMedoidsWrapper::getBuildTimePython() {
-    return KMedoids::getBuildTime();
+  size_t km::KMedoidsWrapper::getTotalBuildTimePython() {
+    return KMedoids::getTotalBuildTime();
   }
 
   size_t km::KMedoidsWrapper::getTotalSwapTimePython() {

@@ -92,7 +92,9 @@ namespace km {
     cache_misses_python(&cls);
 
     // Swap timing functions
+    total_build_time(&cls);
     time_per_swap_python(&cls);
     total_swap_time_python(&cls);
+    total_time(&cls);
   }
 }  // namespace km

@@ -124,6 +124,13 @@ class KMedoidsWrapper : public km::KMedoids {
   size_t getCacheMissesPython();
 
   /**
+   * @brief Returns the total time for the entire BUILD procedure by the last call to .fit()
+   *
+   * The total time for the entire BUILD procedure by the last call to .fit()
+   */
+  size_t getTotalBuildTimePython();
+
+  /**
    * @brief Returns the total time for the entire SWAP procedure by the last call to .fit()
    *
    * The total time for the entire SWAP procedure by the last call to .fit()
@@ -135,7 +142,14 @@ class KMedoidsWrapper : public km::KMedoids {
    *
    * The average time per swap step by the last call to .fit()
    */
-  float getTimePerSwapPython();
+  size_t getTimePerSwapPython();
+
+  /**
+   * @brief Returns the total time for the entire fitting procedure by the last call to .fit()
+   *
+   * The total time for the entire fitting procedure by the last call to .fit()
+   */
+  size_t getTotalTimePython();
 };
 
 // TODO(@motiwari): Encapsulate these
