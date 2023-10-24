@@ -1,5 +1,10 @@
 import numpy as np
 
+from constants import (
+    DATASETS_AND_LOSSES,
+    ALL_ALGORITHMS,
+)
+
 def str_to_bool(s: str) -> bool:
     if s == 'True':
         return True
@@ -43,9 +48,6 @@ def generate_config():
     Generates the config file for all experiments from the paper.
     """
     added_exps = []
-
-    DATASETS_AND_LOSSES = [("MNIST", "L2"), ('CIFAR10', "L1"), ('SCRNA', "L1"), ('NEWSGROUPS', "cos")]
-    ALL_ALGORITHMS = ["BP++", "BP+CA", "BP+VA", "BP"]
 
     # For Table 1
 
