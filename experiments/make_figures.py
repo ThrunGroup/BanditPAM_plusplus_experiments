@@ -255,7 +255,20 @@ def make_figure_3():
     fig4.savefig(os.path.join("figures", "figure4.pdf"), format='pdf')
 
 def make_appendix_table_1():
-    pass
+    appendix_table_1_exps = get_appendix_table_1_exps()
+    a_table_1_results = get_pd_from_exps(appendix_table_1_exps)
+
+    # For 4 datasets and 4 sizes of n and each seed, measure loss row of BP++ over BP
+    a_table_1_results = a_table_1_results[['dataset', 'n', 'seed', 'algorithm', 'swap_confidence', 'Final loss']]
+    a_table_1_results_bp = a_table_1_results[a_table_1_results['algorithm'] == 'BP']
+    a_table_1_results_bppp = a_table_1_results[a_table_1_results['algorithm'] == 'BP++']
+    merged = a_table_1_results_bppp.merge(a_table_1_results_bp, on=['dataset', 'n', 'seed', 'swap_confidence'], how='left')
+    answer1 = pd.to_numeric(merged['Final loss_x'])
+    answer2 = pd.to_numeric(merged['Final loss_y'])
+
+    answer = answer1 / answer2
+    merged['ratio'] = answer  # Should get 1.0 everywhere
+    print(merged)
 
 
 def make_appendix_figure_1():
