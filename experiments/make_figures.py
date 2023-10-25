@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 import os
 from typing import List
+# import matplotlib
+# matplotlib.use("GTK3Agg")
+
+import matplotlib.pyplot as plt
+
 
 from constants import (
     DATASETS_AND_LOSSES,
@@ -69,15 +74,16 @@ def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
     for exp_idx, exp in enumerate(exps):
         exp_params = get_exp_params_from_name(exp)
         logfile = os.path.join("logs", exp)
-        exp_result = parse_logfile(logfile)
+        if os.path.exists(logfile):
+            exp_result = parse_logfile(logfile)
 
-        # The | takes the second dict's values.
-        # If there are any conflicts. In this case, there shouldn't be any, so it's a merge of dicts
-        row_dict = exp_params | exp_result
+            # The | takes the second dict's values.
+            # If there are any conflicts. In this case, there shouldn't be any, so it's a merge of dicts
+            row_dict = exp_params | exp_result
 
-        # I'm so sorry
-        row = pd.DataFrame.from_dict([row_dict])
-        results = pd.concat([results, row])
+            # I'm so sorry
+            row = pd.DataFrame.from_dict([row_dict])
+            results = pd.concat([results, row])
 
     return results
 
@@ -98,7 +104,71 @@ def make_table_1():
     print(merged)
 
 def make_figures_1_and_2():
-    pass
+    fig1_2_exps = get_figures_1_and_2_exps()
+    fig1_2_results = get_pd_from_exps(fig1_2_exps)
+
+    fig1, ax1 = plt.subplots(2, 2)
+    fig2, ax2 = plt.subplots(2, 2)
+
+    for dataset_idx in range(4):
+        dataset, loss = DATASETS_AND_LOSSES[dataset_idx]
+        for algorithm_idx, algorithm in enumerate(ALL_ALGORITHMS):
+            algo_results = fig1_2_results[(fig1_2_results['algorithm'] == algorithm) & (fig1_2_results['dataset'] == dataset) & (fig1_2_results['loss'] == loss)]
+            xs = pd.to_numeric(algo_results['n'])
+            times = pd.to_numeric(algo_results['Total time']) / (1000*(pd.to_numeric(algo_results['T']) + 1))
+            samples = pd.to_numeric(algo_results['Total distance comps']) / (pd.to_numeric(algo_results['T']) + 1)
+
+            ax1[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=algorithm, marker='o')
+            ax2[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=algorithm, marker='o')
+
+        # Set title
+        dataset_to_title = {
+            "MNIST": "MNIST",
+            "CIFAR10": "CIFAR10",
+            "SCRNA": "scRNA",
+            "NEWSGROUPS": "20 Newsgroups",
+        }
+
+        loss_to_title = {
+            "L1": "$L_1$",
+            "L2": "$L_2$",
+            "cos": "Cosine",
+        }
+
+        ks = {
+            "MNIST": 10,
+            "CIFAR10": 10,
+            "SCRNA": 5,
+            "NEWSGROUPS": 5,
+        }
+
+        ax1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
+        ax2[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
+
+        ax1[dataset_idx // 2, dataset_idx % 2].set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $k = {ks[dataset]}$")
+        ax2[dataset_idx // 2, dataset_idx % 2].set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $k = {ks[dataset]}$")
+        ax1[dataset_idx // 2, dataset_idx % 2].grid()
+        ax2[dataset_idx // 2, dataset_idx % 2].grid()
+
+        # if dataset_idx % 2 == 0:  # Apply y label to right column
+        ax1[dataset_idx // 2, dataset_idx % 2].set_ylabel("Time per step (s)")
+        ax2[dataset_idx // 2, dataset_idx % 2].set_ylabel("Sample complexity per step")
+
+        # if dataset_idx // 2 == 1:  # Apply x label to bottom row
+        ax1[dataset_idx // 2, dataset_idx % 2].set_xlabel("Subsample size ($n$)")
+        ax2[dataset_idx // 2, dataset_idx % 2].set_xlabel("Subsample size ($n$)")
+
+    fig1.tight_layout()
+    fig2.tight_layout()
+    fig1.set_size_inches(16, 10)
+    fig2.set_size_inches(16, 10)
+    handles1, labels1 = ax1[0, 0].get_legend_handles_labels()
+    fig1.legend(handles1, labels1, loc='center', ncol=4)
+
+    handles2, labels2 = ax2[0, 0].get_legend_handles_labels()
+    fig2.legend(handles2, labels2, loc='center', ncol=4)
+    fig1.savefig(os.path.join("figures", "figure1.pdf"), format='pdf')
+    fig2.savefig(os.path.join("figures", "figure2.pdf"), format='pdf')
 
 
 def make_figure_3():
