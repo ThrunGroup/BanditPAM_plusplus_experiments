@@ -14,7 +14,7 @@ def str_to_bool(s: str) -> bool:
     else:
         raise ValueError(f"String {s} cannot be converted to bool")
 
-    
+
 def get_exp_name(exp: dict) -> str:
     return str(
         exp['dataset'] + '_' +

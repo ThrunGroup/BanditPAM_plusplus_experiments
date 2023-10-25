@@ -1,253 +1,111 @@
 import numpy as np
 import pandas as pd
+import os
+from typing import List
 
 from constants import (
     DATASETS_AND_LOSSES,
     ALL_ALGORITHMS,
 )
+from create_configs import (
+    str_to_bool,
+    get_exp_name,
+    get_exp_params_from_name,
+    get_table_1_exps,
+    get_figures_1_and_2_exps,
+    get_figure_3_exps,
+    get_appendix_table_1_exps,
+    get_appendix_figure_1_exps,
+    get_appendix_table_2_exps,
+)
 
-def generate_config():
-    """
-    Generates the config file for all experiments from the paper.
-    """
-    added_exps = []
+FIG_SIZE = (16, 16)
 
+def parse_logfile(logfile: str) -> dict:
+    with open(logfile, 'r') as f:
+        lines = f.readlines()
+        result = {}
+        for line in lines:
+            result[line.split(':')[0].strip()] = line.split(':')[1].strip()
+        print(result)
+        return result
 
+HEADERS = [
+    # These MUST be the same as the keys in the exp_parms dicts
+    "dataset",
+    "loss",
+    "algorithm",
+    "n",
+    "k",
+    "T",
+    "cache_width",
+    "build_onfidence",
+    "swap_confidence",
+    "parallelize",
+    "seed",
 
+    # These MUST be the same as the rows in the logfiles
+    'Build distance comps',
+    'Swap distance comps',
+    'Misc distance comps',
+    'Build + Swap distance comps',
+    'Total distance comps',
+    'Number of Steps',
+    'Total Build time',
+    'Total Swap time',
+    'Time per swap',
+    'Total time',
+    'Build loss',
+    'Final loss',
+    'Loss trajectory',
+    'Build medoids',
+    'Final medoids',
+    'Cache Hits',
+    'Cache Misses',
+    'Cache Writes',
+]
 
+def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
+    results = pd.DataFrame(columns=HEADERS)
+    for exp_idx, exp in enumerate(exps):
+        exp_params = get_exp_params_from_name(exp)
+        logfile = os.path.join("logs", exp)
+        exp_result = parse_logfile(logfile)
+
+        # The | takes the second dict's values.
+        # If there are any conflicts. In this case, there shouldn't be any, so it's a merge of dicts
+        row_dict = exp_params | exp_result
+
+        # I'm so sorry
+        row = pd.DataFrame.from_dict([row_dict])
+        results = pd.concat([results, row])
+
+    return results
 
 def make_table_1():
-    for n in [10000, 15000, 20000, 25000, 30000]:
-        for dataset, loss in DATASETS_AND_LOSSES:
-            if dataset in ["MNIST", "CIFAR10"]:
-                k = 10
-            elif dataset in ["SCRNA", "NEWSGROUPS"]:
-                k = 5
+    table_1_exps = get_table_1_exps()
+    table_1_results = get_pd_from_exps(table_1_exps)
+    print(table_1_results)
 
-            T = 10
-            cache_width = 1000
-            build_confidence = 3
-            swap_confidence = 5
-            parallelize = False
 
-            for algorithm in ["BP++", "BP"]:
-                for seed in range(1):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
 
 def make_figures_1_and_2():
-    # For Fig 1 and Fig 2
-
-    for dataset, loss in DATASETS_AND_LOSSES:
-        if dataset in ["MNIST", "CIFAR10"]:
-            k = 10
-        elif dataset in ["SCRNA", "NEWSGROUPS"]:
-            k = 5
-
-        if dataset == "MNIST":
-            n_schedule = np.linspace(10000, 70000, 5, dtype=int)
-        elif dataset == "CIFAR10":
-            n_schedule = np.linspace(10000, 30000, 5, dtype=int)
-        elif dataset == "SCRNA":
-            n_schedule = np.linspace(10000, 40000, 4, dtype=int)
-        elif dataset == "NEWSGROUPS":
-            n_schedule = np.linspace(10000, 50000, 5, dtype=int)
-        else:
-            raise Exception("Bad dataset")
-
-        T = 10
-        cache_width = 1000
-        build_confidence = 3
-        swap_confidence = 5
-        parallelize = False
-
-        for n in n_schedule:
-            for algorithm in ALL_ALGORITHMS:
-                for seed in range(3):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
-
-
+    pass
 
 
 def make_figure_3():
-    for dataset, loss in DATASETS_AND_LOSSES:
-        k_schedule = [5, 10, 15]
-
-        if dataset in ["MNIST", 'CIFAR10']:
-            n = 20000
-        elif dataset in ["SCRNA", "NEWSGROUPS"]:
-            n = 10000
-        else:
-            raise Exception("Bad dataset")
-
-        T = 10
-        cache_width = 1000
-        build_confidence = 3
-        swap_confidence = 5
-        parallelize = False
-
-        for k in k_schedule:
-            for algorithm in ALL_ALGORITHMS:
-                for seed in range(3):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
+    pass
 
 def make_appendix_table_1():
-    # For Appendix Table 1
-
-    for dataset, loss in DATASETS_AND_LOSSES:
-        n = 10000
-
-        if dataset in ["MNIST", 'CIFAR10']:
-            k = 10
-        elif dataset in ["SCRNA", "NEWSGROUPS"]:
-            k = 5
-        else:
-            raise Exception("Bad dataset")
-
-        T = 10
-        cache_width = 1000
-        build_confidence = 3
-        parallelize = False
-
-        swap_confidence_schedule = [2, 3, 5, 10]
-
-        for swap_confidence in swap_confidence_schedule:
-            for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
+    pass
 
 
 def make_appendix_figure_1():
-    # For Appendix Figure 1
-
-    for dataset, loss in DATASETS_AND_LOSSES:
-        n = 10000
-
-        if dataset in ["MNIST", 'CIFAR10']:
-            k = 10
-        elif dataset in ["SCRNA", "NEWSGROUPS"]:
-            k = 5
-        else:
-            raise Exception("Bad dataset")
-
-        T_schedule = range(1, 11)
-        cache_width = 1000
-        build_confidence = 3
-        swap_confidence = 5
-        parallelize = False
-
-        for T in T_schedule:
-            for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
-
+    pass
 
 
 def make_appendix_table_2():
-    # For Appendix Table 2
-
-    for dataset, loss in DATASETS_AND_LOSSES:
-        n = 10000
-        k_schedule = [5, 10, 15]
-        T = 10
-        cache_width = 1000
-        build_confidence = 3
-        swap_confidence = 5
-        parallelize = False
-
-        for k in k_schedule:
-            for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
-                    exp = {
-                        'dataset': dataset,
-                        'loss': loss,
-                        'algorithm': algorithm,
-                        'n': n,
-                        'k': k,
-                        'T': T,
-                        'cache_width': cache_width,
-                        'build_confidence': build_confidence,
-                        'swap_confidence': swap_confidence,
-                        'parallelize': parallelize,
-                        'seed': seed,
-                    }
-                    exp_name = get_exp_name(exp)
-                    if exp_name not in added_exps:
-                        added_exps.append(exp_name)
+    pass
 
 def make_all_figures():
     make_table_1()
