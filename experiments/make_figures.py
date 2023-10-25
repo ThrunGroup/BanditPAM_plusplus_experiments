@@ -184,7 +184,7 @@ def make_figure_3():
     fig3_results = get_pd_from_exps(fig3_exps)
 
     fig3, ax3 = plt.subplots(2, 2)
-    _fig4, _ax4 = plt.subplots(2, 2)
+    fig4, ax4 = plt.subplots(2, 2)
 
     for dataset_idx in range(4):
         dataset, loss = DATASETS_AND_LOSSES[dataset_idx]
@@ -197,7 +197,7 @@ def make_figure_3():
             samples = pd.to_numeric(algo_results['Total distance comps']) / (pd.to_numeric(algo_results['T']) + 1)
 
             ax3[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=algorithm, marker='o')
-            _ax4[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=algorithm, marker='o')
+            ax4[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=algorithm, marker='o')
 
         # Set title
         dataset_to_title = {
@@ -221,34 +221,34 @@ def make_figure_3():
         }
 
         ax3[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
-        _ax4[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
+        ax4[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
 
         ax3[dataset_idx // 2, dataset_idx % 2].set_title(
             f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = {ns[dataset]}$")
-        _ax4[dataset_idx // 2, dataset_idx % 2].set_title(
+        ax4[dataset_idx // 2, dataset_idx % 2].set_title(
             f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = {ns[dataset]}$")
         ax3[dataset_idx // 2, dataset_idx % 2].grid()
-        _ax4[dataset_idx // 2, dataset_idx % 2].grid()
+        ax4[dataset_idx // 2, dataset_idx % 2].grid()
 
         # if dataset_idx % 2 == 0:  # Apply y label to right column
         ax3[dataset_idx // 2, dataset_idx % 2].set_ylabel("Time per step (s)")
-        _ax4[dataset_idx // 2, dataset_idx % 2].set_ylabel("Sample complexity per step")
+        ax4[dataset_idx // 2, dataset_idx % 2].set_ylabel("Sample complexity per step")
 
         # if dataset_idx // 2 == 1:  # Apply x label to bottom row
         ax3[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of medoids ($k$)")
-        _ax4[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of medoids ($k$)")
+        ax4[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of medoids ($k$)")
 
     fig3.tight_layout()
-    _fig4.tight_layout()
+    fig4.tight_layout()
     fig3.set_size_inches(16, 10)
-    _fig4.set_size_inches(16, 10)
+    fig4.set_size_inches(16, 10)
     handles1, labels1 = ax3[0, 0].get_legend_handles_labels()
     fig3.legend(handles1, labels1, loc='center', ncol=4)
 
-    handles2, labels2 = _ax4[0, 0].get_legend_handles_labels()
-    _fig4.legend(handles2, labels2, loc='center', ncol=4)
+    handles2, labels2 = ax4[0, 0].get_legend_handles_labels()
+    fig4.legend(handles2, labels2, loc='center', ncol=4)
     fig3.savefig(os.path.join("figures", "figure3.pdf"), format='pdf')
-    _fig4.savefig(os.path.join("figures", "_figure4.pdf"), format='pdf')
+    fig4.savefig(os.path.join("figures", "figure4.pdf"), format='pdf')
 
 def make_appendix_table_1():
     pass
