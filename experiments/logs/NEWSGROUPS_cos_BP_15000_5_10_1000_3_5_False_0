@@ -1,0 +1,18 @@
+Build distance comps: 67476900
+Swap distance comps: 96320700
+Misc distance comps: 300675000
+Build + Swap distance comps: 163797600
+Total distance comps: 464472600
+Number of Steps: 3
+Total Build time: 97038
+Total Swap time: 215347
+Time per swap: 71782
+Total time: 312385
+Build loss: 0.7563283443450928
+Final loss: 0.7531382441520691
+Loss trajectory: [0.7563283443450928, 0.7547470927238464, 0.7531382441520691, 0.7531382441520691]
+Build medoids: [2650 9700 6205  162 3339]
+Final medoids: [12036  1314  6205   162  3339]
+Cache Hits: 0
+Cache Misses: 0
+Cache Writes: 0
