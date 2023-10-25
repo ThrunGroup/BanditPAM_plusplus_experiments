@@ -27,7 +27,6 @@ def parse_logfile(logfile: str) -> dict:
         result = {}
         for line in lines:
             result[line.split(':')[0].strip()] = line.split(':')[1].strip()
-        print(result)
         return result
 
 HEADERS = [
@@ -68,7 +67,7 @@ HEADERS = [
 def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
     results = pd.DataFrame(columns=HEADERS)
     for exp_idx, exp in enumerate(exps):
-        if exp_idx >= 2: break
+        if exp_idx >= 9: break
         exp_params = get_exp_params_from_name(exp)
         logfile = os.path.join("logs", exp)
         exp_result = parse_logfile(logfile)
@@ -89,20 +88,15 @@ def make_table_1():
 
     # For 4 datasets and 4 sizes of n and each seed, measure loss row of BP++ over BP
     table_1_results = table_1_results[['dataset', 'n', 'seed', 'algorithm', 'Final loss']]
-    import ipdb; ipdb.set_trace()
-    merged = table_1_results.merge(table_1_results, on=['dataset', 'n', 'seed'])
+    table_1_results_bp = table_1_results[table_1_results['algorithm'] == 'BP']
+    table_1_results_bppp = table_1_results[table_1_results['algorithm'] == 'BP++']
+    merged = table_1_results_bppp.merge(table_1_results_bp, on=['dataset', 'n', 'seed'], how='left')
     answer1 = pd.to_numeric(merged['Final loss_x'])
     answer2 = pd.to_numeric(merged['Final loss_y'])
 
     answer = answer1 / answer2
-    df = pd.DataFrame(zip(merged[['dataset', 'n', 'seed']], answer))
-
-    table_1_results = table_1_results.groupby(['dataset', 'n']).mean()  # Average over seeds
-
-    # Should get 1.0 everywhere
-
-
-
+    merged['ratio'] = answer  # Should get 1.0 everywhere
+    print(merged)
 
 def make_figures_1_and_2():
     pass
