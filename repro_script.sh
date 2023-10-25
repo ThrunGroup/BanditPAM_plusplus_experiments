@@ -4,10 +4,12 @@
 
 # Install prerequisites
 pip install -r requirements.txt
-brew install libomp armadillo
+
+# TODO: Do this on Mac
+# brew install libomp armadillo
 
 # Remove files possibly left over from previous builds
-sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && sudo python -m pip uninstall -y banditpam
+sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && python -m pip uninstall -y banditpam
 
 # Install BanditPAM package
 pip install --no-use-pep517 --no-cache-dir --ignore-installed -vvvvv -e .
