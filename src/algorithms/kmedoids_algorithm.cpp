@@ -412,7 +412,7 @@ namespace km {
       // TODO(@motiwari): Potential race condition with shearing?
       // T1 begins to write to cache and then T2
       // access in the middle of write?
-      if (cache[(m * i) + reindex[j]] == -1) {
+      if (cache[(m * i) + reindex[j]] == -1) {  // Cache value is unassigned
         // TODO(@motiwari): Change category to an enum
         if (category == 0) {  // MISC
           numMiscDistanceComputations++;
@@ -433,6 +433,17 @@ namespace km {
         numCacheHits++;
       }
       return cache[m * i + reindex[j]];
+    }
+
+    // Point queried is not in the cache. Cache miss.
+    if (category == 0) {  // MISC
+      numMiscDistanceComputations++;
+    } else if (category == 1) {  // BUILD
+      numBuildDistanceComputations++;
+    } else if (category == 2) {  // SWAP
+      numSwapDistanceComputations++;
+    } else {
+      // TODO(@motiwari): Throw exception
     }
 
     numCacheMisses++;

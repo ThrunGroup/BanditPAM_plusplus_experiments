@@ -8,7 +8,7 @@ from create_configs import get_exp_name, get_exp_params_from_name
 def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
     if dataset == "MNIST":
         data = np.loadtxt(os.path.join("..", "data", "MNIST_70k.csv"))
-    elif dataset == "CIFAR":
+    elif dataset == "CIFAR10":
         data = np.loadtxt(os.path.join("..", "data", "cifar10.csv"), delimiter=",")
     elif dataset == "SCRNA":
         data = np.loadtxt(os.path.join("..", "data", "reduced_scrna.csv"), delimiter=",")
@@ -82,6 +82,9 @@ def run_exp(exp: dict) -> None:
             fout.write("Loss trajectory: " + str(kmed.losses) + "\n")
             fout.write("Build medoids: " + str(kmed.build_medoids) + "\n")
             fout.write("Final medoids: " + str(kmed.medoids) + "\n")
+            fout.write("Cache Hits: " + str(kmed.cache_hits) + "\n")
+            fout.write("Cache Misses: " + str(kmed.cache_misses) + "\n")
+            fout.write("Cache Writes: " + str(kmed.cache_writes) + "\n")
 
     else:
         print(f"Already have results for {exp_name}...")
@@ -89,7 +92,6 @@ def run_exp(exp: dict) -> None:
 def main():
     with open("all_configs.csv", "r") as exp_file:
         for line in exp_file:
-            print(line)
             exp = get_exp_params_from_name(line.strip())
             run_exp(exp)
 
