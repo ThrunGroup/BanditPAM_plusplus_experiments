@@ -68,6 +68,7 @@ HEADERS = [
 def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
     results = pd.DataFrame(columns=HEADERS)
     for exp_idx, exp in enumerate(exps):
+        if exp_idx >= 2: break
         exp_params = get_exp_params_from_name(exp)
         logfile = os.path.join("logs", exp)
         exp_result = parse_logfile(logfile)
@@ -85,7 +86,21 @@ def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
 def make_table_1():
     table_1_exps = get_table_1_exps()
     table_1_results = get_pd_from_exps(table_1_exps)
-    print(table_1_results)
+
+    # For 4 datasets and 4 sizes of n and each seed, measure loss row of BP++ over BP
+    table_1_results = table_1_results[['dataset', 'n', 'seed', 'algorithm', 'Final loss']]
+    import ipdb; ipdb.set_trace()
+    merged = table_1_results.merge(table_1_results, on=['dataset', 'n', 'seed'])
+    answer1 = pd.to_numeric(merged['Final loss_x'])
+    answer2 = pd.to_numeric(merged['Final loss_y'])
+
+    answer = answer1 / answer2
+    df = pd.DataFrame(zip(merged[['dataset', 'n', 'seed']], answer))
+
+    table_1_results = table_1_results.groupby(['dataset', 'n']).mean()  # Average over seeds
+
+    # Should get 1.0 everywhere
+
 
 
 
