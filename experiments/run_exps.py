@@ -4,6 +4,8 @@ import os
 import banditpam
 from create_configs import get_exp_name, get_exp_params_from_name
 
+MACHINE_INDEX = 0
+NUM_MACHINES = 20
 
 def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
     if dataset == "MNIST":
@@ -91,9 +93,10 @@ def run_exp(exp: dict) -> None:
 
 def main():
     with open("all_configs.csv", "r") as exp_file:
-        for line in exp_file:
-            exp = get_exp_params_from_name(line.strip())
-            run_exp(exp)
+        for line_idx, line in enumerate(exp_file):
+            if line_idx % NUM_MACHINES == MACHINE_INDEX:
+                exp = get_exp_params_from_name(line.strip())
+                run_exp(exp)
 
 
 if __name__ == "__main__":
