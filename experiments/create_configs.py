@@ -110,7 +110,7 @@ def get_figures_1_and_2_exps() -> List:
 
         for n in n_schedule:
             for algorithm in ALL_ALGORITHMS:
-                for seed in range(3):
+                for seed in range(1):  # TODO(@motiwari): Change to 3
                     exp = {
                         'dataset': dataset,
                         'loss': loss,
@@ -149,7 +149,7 @@ def get_figure_3_exps() -> List:
 
         for k in k_schedule:
             for algorithm in ALL_ALGORITHMS:
-                for seed in range(3):
+                for seed in range(1):  # TODO(@motiwari): Change to 3
                     exp = {
                         'dataset': dataset,
                         'loss': loss,
@@ -189,7 +189,7 @@ def get_appendix_table_1_exps() -> List:
 
         for swap_confidence in swap_confidence_schedule:
             for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
+                for seed in range(1):  # TODO(@motiwari): Change to 3
                     exp = {
                         'dataset': dataset,
                         'loss': loss,
@@ -228,7 +228,7 @@ def get_appendix_figure_1_exps() -> List:
 
         for T in T_schedule:
             for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
+                for seed in range(1):  # TODO(@motiwari): Change to 3
                     exp = {
                         'dataset': dataset,
                         'loss': loss,
@@ -260,7 +260,7 @@ def get_appendix_table_2_exps() -> List:
 
         for k in k_schedule:
             for algorithm in ["BP++", "BP"]:
-                for seed in range(3):
+                for seed in range(1):  # TODO(@motiwari): Change to 3
                     exp = {
                         'dataset': dataset,
                         'loss': loss,

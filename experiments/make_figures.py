@@ -67,7 +67,6 @@ HEADERS = [
 def get_pd_from_exps(exps: List[str]) -> pd.DataFrame:
     results = pd.DataFrame(columns=HEADERS)
     for exp_idx, exp in enumerate(exps):
-        if exp_idx >= 9: break
         exp_params = get_exp_params_from_name(exp)
         logfile = os.path.join("logs", exp)
         exp_result = parse_logfile(logfile)
