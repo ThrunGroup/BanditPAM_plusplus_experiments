@@ -5,7 +5,7 @@ import banditpam
 from create_configs import get_exp_name, get_exp_params_from_name
 
 MACHINE_INDEX = 0
-NUM_MACHINES = 20
+NUM_MACHINES = 19
 
 def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
     if dataset == "MNIST":
