@@ -271,7 +271,7 @@ def make_appendix_table_1():
 
 
 def make_appendix_figure_1():
-    afig1_exps = get_figure_3_exps()
+    afig1_exps = get_appendix_figure_1_exps()
     afig1_results = get_pd_from_exps(afig1_exps)
 
     afig1, axa1 = plt.subplots(2, 2)
@@ -282,7 +282,7 @@ def make_appendix_figure_1():
         algo_results = afig1_results[
             (afig1_results['algorithm'] == algorithm) & (afig1_results['dataset'] == dataset) & (
                     afig1_results['loss'] == loss)]
-        xs = (pd.to_numeric(algo_results['Number of Steps'])).astype(int)
+        xs = (pd.to_numeric(algo_results['T'])).astype(int)
         losses = pd.to_numeric(algo_results['Final loss'])
         axa1[dataset_idx // 2, dataset_idx % 2].plot(xs, losses, label=algorithm, marker='o')
 
