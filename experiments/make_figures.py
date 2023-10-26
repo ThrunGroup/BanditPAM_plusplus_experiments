@@ -349,7 +349,7 @@ def make_appendix_table_2():
 
     bppp_total_time = pd.to_numeric(merged['Total time_x'])
     bp_total_time = pd.to_numeric(merged['Total time_y'])
-    total_ratio = bp_total_time / bppp_total_time 
+    total_ratio = bp_total_time / bppp_total_time
     merged['total speedup ratio'] = total_ratio
 
 
