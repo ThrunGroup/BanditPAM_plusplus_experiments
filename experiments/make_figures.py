@@ -51,7 +51,7 @@ HEADERS = [
     "k",
     "T",
     "cache_width",
-    "build_onfidence",
+    "build_confidence",
     "swap_confidence",
     "parallelize",
     "seed",
@@ -149,7 +149,6 @@ def make_figures_1_and_2():
             "SCRNA": 5,
             "NEWSGROUPS": 5,
         }
-
         ax1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
         ax2[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
 

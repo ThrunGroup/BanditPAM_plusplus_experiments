@@ -21,7 +21,7 @@ def get_data(dataset: str, n: int, seed: int) -> np.ndarray:
         raise Exception("Bad dataset")
 
     np.random.seed(seed)
-    return data[np.random.choice(len(data), size=n)]
+    return data[np.random.choice(len(data), size=n)]  # TODO: Replace=True. Fix and rerun with replace=False!
 
 def run_exp(exp: dict) -> None:
     """
