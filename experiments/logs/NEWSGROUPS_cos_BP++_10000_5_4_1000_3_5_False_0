@@ -4,10 +4,10 @@ Misc distance comps: 10400000
 Build + Swap distance comps: 77904900
 Total distance comps: 88304900
 Number of Steps: 4
-Total Build time: 35024
-Total Swap time: 41097
-Time per swap: 10274
-Total time: 76121
+Total Build time: 34823
+Total Swap time: 40944
+Time per swap: 10236
+Total time: 75767
 Build loss: 0.7564448118209839
 Final loss: 0.7555683851242065
 Loss trajectory: [0.7564448118209839, 0.7560004591941833, 0.7555683851242065, 0.7555683851242065, 0.7555683851242065]
