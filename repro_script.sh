@@ -6,7 +6,7 @@
 pip install -r requirements.txt
 
 # TODO: Do this on Mac
-# brew install libomp armadillo
+brew install libomp armadillo
 
 # Remove files possibly left over from previous builds
 sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && python -m pip uninstall -y banditpam
@@ -63,4 +63,7 @@ fi
 cd -  # Go back to directory from where script was run
 
 # 3. Run the experiments
-python repro_script.py
+cd experiments
+python create_configs.py
+python run_exps.py
+python make_figures.py

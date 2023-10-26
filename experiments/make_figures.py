@@ -327,7 +327,33 @@ def make_appendix_figure_1():
 
 
 def make_appendix_table_2():
-    pass
+    print("Making appendix table 2...")
+    appendix_table_2_exps = get_appendix_table_2_exps()
+    a_table_2_results = get_pd_from_exps(appendix_table_2_exps)
+
+    # For 4 datasets and 4 sizes of n and each seed, measure loss row of BP++ over BP
+    a_table_2_results = a_table_2_results[['dataset', 'n', 'k', 'seed', 'algorithm', 'Total Build time', 'Total time', 'Time per swap']]
+    a_table_2_results_bp = a_table_2_results[a_table_2_results['algorithm'] == 'BP']
+    a_table_2_results_bppp = a_table_2_results[a_table_2_results['algorithm'] == 'BP++']
+    merged = a_table_2_results_bppp.merge(a_table_2_results_bp, on=['dataset', 'n', 'k', 'seed'], how='left')
+
+    bppp_build_time = pd.to_numeric(merged['Total Build time_x'])
+    bp_build_time = pd.to_numeric(merged['Total Build time_y'])
+    build_ratio = bp_build_time / bppp_build_time
+    merged['build speedup ratio'] = build_ratio
+
+    bppp_swap_time = pd.to_numeric(merged['Time per swap_x'])
+    bp_swap_time = pd.to_numeric(merged['Time per swap_y'])
+    swap_ratio = bp_swap_time / bppp_swap_time
+    merged['swap speedup ratio'] = swap_ratio
+
+    bppp_total_time = pd.to_numeric(merged['Total time_x'])
+    bp_total_time = pd.to_numeric(merged['Total time_y'])
+    total_ratio = bp_total_time / bppp_total_time 
+    merged['total speedup ratio'] = total_ratio
+
+
+    print(merged)
 
 def make_all_figures():
     make_table_1()
