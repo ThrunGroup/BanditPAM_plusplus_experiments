@@ -245,55 +245,48 @@ def make_appendix_figure_1():
     afig1_exps = get_appendix_figure_1_exps()
     afig1_results = get_pd_from_exps(afig1_exps)
 
-    afig1, axa1 = plt.subplots(2, 2)
 
-    for dataset_idx in range(4):
-        dataset, loss = DATASETS_AND_LOSSES[dataset_idx]
+
+    # Set title
+    dataset_to_title = {
+        "MNIST": "MNIST",
+        "CIFAR10": "CIFAR10",
+        "SCRNA": "scRNA",
+        "NEWSGROUPS": "20 Newsgroups",
+    }
+
+    loss_to_title = {
+        "L1": "$L_1$",
+        "L2": "$L_2$",
+        "cos": "Cosine",
+    }
+
+    ks = {
+        "MNIST": 10,
+        "CIFAR10": 10,
+        "SCRNA": 5,
+        "NEWSGROUPS": 5,
+    }
+
+    for dataset_idx in range(len(DATASETS_AND_LOSSES_WITHOUT_SCRNA)):
+        afig1, axa1 = plt.subplots(1, 1)
+        dataset, loss = DATASETS_AND_LOSSES_WITHOUT_SCRNA[dataset_idx]
         algorithm = "BP++"
         algo_results = afig1_results[
             (afig1_results['algorithm'] == algorithm) & (afig1_results['dataset'] == dataset) & (
                     afig1_results['loss'] == loss)]
         xs = (pd.to_numeric(algo_results['T'])).astype(int)
+
         losses = pd.to_numeric(algo_results['Final loss'])
-        axa1[dataset_idx // 2, dataset_idx % 2].plot(xs, losses, label=algorithm, marker='o')
-
-        # Set title
-        dataset_to_title = {
-            "MNIST": "MNIST",
-            "CIFAR10": "CIFAR10",
-            "SCRNA": "scRNA",
-            "NEWSGROUPS": "20 Newsgroups",
-        }
-
-        loss_to_title = {
-            "L1": "$L_1$",
-            "L2": "$L_2$",
-            "cos": "Cosine",
-        }
-
-        ks = {
-            "MNIST": 10,
-            "CIFAR10": 10,
-            "SCRNA": 5,
-            "NEWSGROUPS": 5,
-        }
-
-        axa1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
-        axa1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='x', style='plain')
-
-        axa1[dataset_idx // 2, dataset_idx % 2].set_title(
+        axa1.plot(xs, losses, label=algorithm, marker='o')
+        axa1.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+        axa1.ticklabel_format(axis='x', style='plain')
+        axa1.set_title(
             f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = 10000$, $k = {ks[dataset]}$")
-        axa1[dataset_idx // 2, dataset_idx % 2].grid()
-
-        # if dataset_idx % 2 == 0:  # Apply y label to right column
-        axa1[dataset_idx // 2, dataset_idx % 2].set_ylabel("Final clustering loss")
-
-        # if dataset_idx // 2 == 1:  # Apply x label to bottom row
-        axa1[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of SWAP iterations ($T$)")
-
-    afig1.tight_layout()
-    afig1.set_size_inches(16, 10)
-    afig1.savefig(os.path.join("figures", "appendix_figure1.pdf"), format='pdf')
+        axa1.grid()
+        axa1.set_ylabel("Final clustering loss")
+        axa1.set_xlabel("Number of SWAP iterations ($T$)")
+        afig1.savefig(os.path.join("figures", "appendix_figure1_ " + str(dataset) + ".pdf"), format='pdf')
 
 
 def make_appendix_table_2():
