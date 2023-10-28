@@ -10,9 +10,13 @@ import matplotlib.pyplot as plt
 
 from constants import (
     DATASETS_AND_LOSSES,
+    DATASETS_AND_LOSSES_WITHOUT_SCRNA,
     ALL_ALGORITHMS,
     ALGORITHM_TO_LEGEND,
+    ALG_COLORS,
+    ALG_LINESTYLES,
 )
+
 from create_configs import (
     str_to_bool,
     get_exp_name,
@@ -137,37 +141,30 @@ def make_figures_1_and_2():
         "NEWSGROUPS": 5,
     }
 
+    def make_individual_figure(fig, ax, dataset, loss, xlabel, ylabel, filename):
+        ax.ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
+        ax.set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $k = {ks[dataset]}$")
+        ax.grid()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.legend(loc='upper left', bbox_to_anchor=(0.15, 0.85))
+        fig.savefig(os.path.join("figures", filename), format='pdf')
 
-
-    for dataset_idx in range(4):
+    for dataset_idx in range(len(DATASETS_AND_LOSSES_WITHOUT_SCRNA)):
         fig1, ax1 = plt.subplots(1, 1)
         fig2, ax2 = plt.subplots(1, 1)
-        dataset, loss = DATASETS_AND_LOSSES[dataset_idx]
+        dataset, loss = DATASETS_AND_LOSSES_WITHOUT_SCRNA[dataset_idx]
         for algorithm_idx, algorithm in enumerate(ALL_ALGORITHMS):
             algo_results = fig1_2_results[(fig1_2_results['algorithm'] == algorithm) & (fig1_2_results['dataset'] == dataset) & (fig1_2_results['loss'] == loss)]
             xs = pd.to_numeric(algo_results['n'])
             times = pd.to_numeric(algo_results['Total time']) / (1000*(pd.to_numeric(algo_results['Number of Steps']) + 1))
             samples = pd.to_numeric(algo_results['Total distance comps']) / (pd.to_numeric(algo_results['Number of Steps']) + 1)
 
-            ax1[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=ALGORITHM_TO_LEGEND[algorithm], marker='o')
-            ax2[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=ALGORITHM_TO_LEGEND[algorithm], marker='o')
+            ax1.plot(xs, times, label=ALGORITHM_TO_LEGEND[algorithm], marker='o', linestyle=ALG_LINESTYLES[algorithm], color=ALG_COLORS[algorithm])
+            ax2.plot(xs, samples, label=ALGORITHM_TO_LEGEND[algorithm], marker='o', linestyle=ALG_LINESTYLES[algorithm], color=ALG_COLORS[algorithm])
 
-
-        ax1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
-        ax1[dataset_idx // 2, dataset_idx % 2].set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $k = {ks[dataset]}$")
-        ax1[dataset_idx // 2, dataset_idx % 2].grid()
-        ax1[dataset_idx // 2, dataset_idx % 2].set_ylabel("Time per step (s)")
-        ax1[dataset_idx // 2, dataset_idx % 2].set_xlabel("Subsample size ($n$)")
-        fig1.savefig(os.path.join("figures", "figure1.pdf"), format='pdf')
-
-
-        ax2[dataset_idx // 2, dataset_idx % 2].set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $k = {ks[dataset]}$")
-        ax2[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
-        ax2[dataset_idx // 2, dataset_idx % 2].grid()
-        ax2[dataset_idx // 2, dataset_idx % 2].set_ylabel("Sample complexity per step")
-        ax2[dataset_idx // 2, dataset_idx % 2].set_xlabel("Subsample size ($n$)")
-        fig2.savefig(os.path.join("figures", "figure2.pdf"), format='pdf')
-        fig2.legend(loc='upper left')
+        make_individual_figure(fig1, ax1, dataset, loss, "Subsample size ($n$)", "Time per step (s)", f"figure1_{dataset}.pdf")
+        make_individual_figure(fig2, ax2, dataset, loss, "Subsample size ($n$)", "Sample complexity per step", f"figure2_{dataset}.pdf")
 
 
 

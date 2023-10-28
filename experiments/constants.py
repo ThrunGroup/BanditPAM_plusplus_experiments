@@ -7,3 +7,17 @@ ALGORITHM_TO_LEGEND = {
     "BP+VA": "BP+VA",
     "BP": "BP",
 }
+
+ALG_COLORS = {
+    "BP++": "crimson",
+    "BP+VA": "gray",
+    "BP+CA": "pink",
+    "BP": "black",
+}
+
+ALG_LINESTYLES = {
+    "BP++": "solid",
+    "BP+VA": "solid",
+    "BP+CA": "solid",
+    "BP": "solid",
+}
