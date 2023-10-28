@@ -172,11 +172,40 @@ def make_figure_3():
     fig3_exps = get_figure_3_exps()
     fig3_results = get_pd_from_exps(fig3_exps)
 
-    fig3, ax3 = plt.subplots(2, 2)
-    fig4, ax4 = plt.subplots(2, 2)
+    # Set title
+    dataset_to_title = {
+        "MNIST": "MNIST",
+        "CIFAR10": "CIFAR10",
+        "SCRNA": "scRNA",
+        "NEWSGROUPS": "20 Newsgroups",
+    }
 
-    for dataset_idx in range(4):
-        dataset, loss = DATASETS_AND_LOSSES[dataset_idx]
+    loss_to_title = {
+        "L1": "$L_1$",
+        "L2": "$L_2$",
+        "cos": "Cosine",
+    }
+
+    ns = {
+        "MNIST": 20000,
+        "CIFAR10": 20000,
+        "SCRNA": 10000,
+        "NEWSGROUPS": 10000,
+    }
+
+    def make_individual_figure(fig, ax, dataset, loss, xlabel, ylabel, filename):
+        ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+        ax.set_title(f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = {ns[dataset]}$")
+        ax.grid()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.legend(loc='upper left', bbox_to_anchor=(0.15, 0.85))
+        fig.savefig(os.path.join("figures", filename), format='pdf')
+
+    for dataset_idx in range(len(DATASETS_AND_LOSSES_WITHOUT_SCRNA)):
+        fig3, ax3 = plt.subplots(1, 1)
+        fig4, ax4 = plt.subplots(1, 1)
+        dataset, loss = DATASETS_AND_LOSSES_WITHOUT_SCRNA[dataset_idx]
         for algorithm_idx, algorithm in enumerate(ALL_ALGORITHMS):
             algo_results = fig3_results[
                 (fig3_results['algorithm'] == algorithm) & (fig3_results['dataset'] == dataset) & (
@@ -185,61 +214,15 @@ def make_figure_3():
             times = pd.to_numeric(algo_results['Total time']) / (1000 * (pd.to_numeric(algo_results['Number of Steps']) + 1))
             samples = pd.to_numeric(algo_results['Total distance comps']) / (pd.to_numeric(algo_results['Number of Steps']) + 1)
 
-            ax3[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=algorithm, marker='o')
-            ax4[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=algorithm, marker='o')
+            ax3.plot(xs, times, label=ALGORITHM_TO_LEGEND[algorithm], marker='o', linestyle=ALG_LINESTYLES[algorithm],
+                     color=ALG_COLORS[algorithm])
+            ax4.plot(xs, samples, label=ALGORITHM_TO_LEGEND[algorithm], marker='o', linestyle=ALG_LINESTYLES[algorithm],
+                     color=ALG_COLORS[algorithm])
 
-        # Set title
-        dataset_to_title = {
-            "MNIST": "MNIST",
-            "CIFAR10": "CIFAR10",
-            "SCRNA": "scRNA",
-            "NEWSGROUPS": "20 Newsgroups",
-        }
+        make_individual_figure(fig3, ax3, dataset, loss, "Number of medoids ($k$)", "Time per step (s)", f"figure3_{dataset}.pdf")
+        make_individual_figure(fig4, ax4, dataset, loss, "Number of medoids ($k$)", "Sample complexity per step", f"figure4_{dataset}.pdf")
 
-        loss_to_title = {
-            "L1": "$L_1$",
-            "L2": "$L_2$",
-            "cos": "Cosine",
-        }
 
-        ns = {
-            "MNIST": 20000,
-            "CIFAR10": 20000,
-            "SCRNA": 10000,
-            "NEWSGROUPS": 10000,
-        }
-
-        ax3[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
-        ax4[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
-
-        ax3[dataset_idx // 2, dataset_idx % 2].set_title(
-            f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = {ns[dataset]}$")
-        ax4[dataset_idx // 2, dataset_idx % 2].set_title(
-            f"{dataset_to_title[dataset]}, {loss_to_title[loss]}, $n = {ns[dataset]}$")
-        ax3[dataset_idx // 2, dataset_idx % 2].grid()
-        ax4[dataset_idx // 2, dataset_idx % 2].grid()
-
-        # if dataset_idx % 2 == 0:  # Apply y label to right column
-        ax3[dataset_idx // 2, dataset_idx % 2].set_ylabel("Time per step (s)")
-        ax4[dataset_idx // 2, dataset_idx % 2].set_ylabel("Sample complexity per step")
-
-        # if dataset_idx // 2 == 1:  # Apply x label to bottom row
-        ax3[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of medoids ($k$)")
-        ax4[dataset_idx // 2, dataset_idx % 2].set_xlabel("Number of medoids ($k$)")
-
-    fig3.tight_layout()
-    fig4.tight_layout()
-    fig3.set_size_inches(16, 10)
-    fig4.set_size_inches(16, 10)
-
-    handles1, labels1 = ax3[0, 0].get_legend_handles_labels()
-    fig3.legend(handles1, labels1, loc='center', ncol=4)
-
-    handles2, labels2 = ax4[0, 0].get_legend_handles_labels()
-    fig4.legend(handles2, labels2, loc='center', ncol=4)
-
-    fig3.savefig(os.path.join("figures", "figure3.pdf"), format='pdf')
-    fig4.savefig(os.path.join("figures", "figure4.pdf"), format='pdf')
 
 def make_appendix_table_1():
     appendix_table_1_exps = get_appendix_table_1_exps()
