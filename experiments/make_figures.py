@@ -286,7 +286,7 @@ def make_appendix_figure_1():
         axa1.grid()
         axa1.set_ylabel("Final clustering loss")
         axa1.set_xlabel("Number of SWAP iterations ($T$)")
-        afig1.savefig(os.path.join("figures", "appendix_figure1_ " + str(dataset) + ".pdf"), format='pdf')
+        afig1.savefig(os.path.join("figures", "appendix_figure1_" + str(dataset) + ".pdf"), format='pdf')
 
 
 def make_appendix_table_2():
