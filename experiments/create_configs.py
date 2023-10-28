@@ -2,7 +2,7 @@ import numpy as np
 from typing import List
 
 from constants import (
-    DATASETS_AND_LOSSES,
+    DATASETS_AND_LOSSES_WITHOUT_SCRNA,
     ALL_ALGORITHMS,
 )
 
@@ -51,7 +51,7 @@ def get_exp_params_from_name(exp_name: str) -> dict:
 def get_table_1_exps() -> List:
     exps = []
     for n in [10000, 15000, 20000, 25000, 30000]:
-        for dataset, loss in DATASETS_AND_LOSSES:
+        for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
             if dataset in ["MNIST", "CIFAR10"]:
                 k = 10
             elif dataset in ["SCRNA", "NEWSGROUPS"]:
@@ -85,7 +85,7 @@ def get_table_1_exps() -> List:
 
 def get_figures_1_and_2_exps() -> List:
     exps = []
-    for dataset, loss in DATASETS_AND_LOSSES:
+    for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
         if dataset in ["MNIST", "CIFAR10"]:
             k = 10
         elif dataset in ["SCRNA", "NEWSGROUPS"]:
@@ -131,7 +131,7 @@ def get_figures_1_and_2_exps() -> List:
 
 def get_figure_3_exps() -> List:
     exps = []
-    for dataset, loss in DATASETS_AND_LOSSES:
+    for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
         k_schedule = [5, 10, 15]
 
         if dataset in ["MNIST", 'CIFAR10']:
@@ -170,7 +170,7 @@ def get_figure_3_exps() -> List:
 
 def get_appendix_table_1_exps() -> List:
     exps = []
-    for dataset, loss in DATASETS_AND_LOSSES:
+    for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
         n = 10000
 
         if dataset in ["MNIST", 'CIFAR10']:
@@ -210,7 +210,7 @@ def get_appendix_table_1_exps() -> List:
 
 def get_appendix_figure_1_exps() -> List:
     exps = []
-    for dataset, loss in DATASETS_AND_LOSSES:
+    for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
         n = 10000
 
         if dataset in ["MNIST", 'CIFAR10']:
@@ -220,7 +220,7 @@ def get_appendix_figure_1_exps() -> List:
         else:
             raise Exception("Bad dataset")
 
-        T_schedule = range(1, 11)
+        T_schedule = range(1, 11)  # TODO: Update this to 15 for k=10 datasets
         cache_width = 1000
         build_confidence = 3
         swap_confidence = 5
@@ -249,7 +249,7 @@ def get_appendix_figure_1_exps() -> List:
 
 def get_appendix_table_2_exps() -> List:
     exps = []
-    for dataset, loss in DATASETS_AND_LOSSES:
+    for dataset, loss in DATASETS_AND_LOSSES_WITHOUT_SCRNA:
         n = 10000
         k_schedule = [5, 10, 15]
         T = 10

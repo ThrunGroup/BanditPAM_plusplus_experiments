@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from constants import (
     DATASETS_AND_LOSSES,
     ALL_ALGORITHMS,
+    ALGORITHM_TO_LEGEND,
 )
 from create_configs import (
     str_to_bool,
@@ -126,8 +127,8 @@ def make_figures_1_and_2():
             times = pd.to_numeric(algo_results['Total time']) / (1000*(pd.to_numeric(algo_results['Number of Steps']) + 1))
             samples = pd.to_numeric(algo_results['Total distance comps']) / (pd.to_numeric(algo_results['Number of Steps']) + 1)
 
-            ax1[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=algorithm, marker='o')
-            ax2[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=algorithm, marker='o')
+            ax1[dataset_idx // 2, dataset_idx % 2].plot(xs, times, label=ALGORITHM_TO_LEGEND[algorithm], marker='o')
+            ax2[dataset_idx // 2, dataset_idx % 2].plot(xs, samples, label=ALGORITHM_TO_LEGEND[algorithm], marker='o')
 
         # Set title
         dataset_to_title = {
@@ -149,6 +150,7 @@ def make_figures_1_and_2():
             "SCRNA": 5,
             "NEWSGROUPS": 5,
         }
+
         ax1[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
         ax2[dataset_idx // 2, dataset_idx % 2].ticklabel_format(axis='both', style='sci', scilimits=(0, 0))
 
