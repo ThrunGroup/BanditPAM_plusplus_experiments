@@ -5,7 +5,7 @@
 # Install prerequisites
 pip install -r requirements.txt
 
-# TODO: Do this on Mac
+# TODO: Do this only  Mac
 brew install libomp armadillo
 
 # Remove files possibly left over from previous builds

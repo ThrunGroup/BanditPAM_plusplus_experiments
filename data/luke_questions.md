@@ -1,3 +1,0 @@
-- Add scaling with $T$ and $\delta$ experiments
-- Clean up python files in `logs/` (e.g., add_average.py, add_swap_only.py, etc.)
-- Save all figures as PDFS in a folder 

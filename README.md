@@ -39,5 +39,5 @@ To reproduce all results, simply run:
 
 This will download all the data, run the experiments, save all the logfiles to `experiments/logs/`, save the plots in 
 `experiments/figures/`, and print the results for the tables to the terminal. Note that running the experiments can take
-a very, very long time (over a week). For the paper, we ran the experiments on AWS using c5.4xlarge instances with 64GB
+a very, very long time (over a week). For the paper, we ran the experiments on AWS using multiple c5.4xlarge instances with 64GB
 of disk space.
