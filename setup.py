@@ -14,6 +14,7 @@ __version__ = "4.0.2"
 # TODO(@motiwari): Move this to a separate file
 GHA = "GITHUB_ACTIONS"
 
+# For AWS instances
 
 class get_pybind_include(object):
     """
@@ -416,8 +417,10 @@ class BuildExt(build_ext):
 
         for ext in self.extensions:
             ext.define_macros = [
-                ("VERSION_INFO",
-                 '"{}"'.format(self.distribution.get_version()))
+                (
+                    "VERSION_INFO",
+                    '"{}"'.format(self.distribution.get_version()),
+                )
             ]
             ext.extra_compile_args = opts
             ext.extra_compile_args += []  # []["-arch", "x86_64"]
@@ -433,6 +436,7 @@ class BuildExt(build_ext):
 def main():
     if sys.platform == "linux" or sys.platform == "linux2":
         include_dirs = [
+            "/piech/u/lukeai/armadillo-code/include/armadillo_bits",
             get_pybind_include(),
             get_numpy_include(),
             "headers",
@@ -472,8 +476,13 @@ def main():
                 "/", "opt", "homebrew", "opt", "armadillo", "include"
             ),
             os.path.join(
-                "/", "opt", "homebrew", "opt", "armadillo", "include",
-                "armadillo_bits"
+                "/",
+                "opt",
+                "homebrew",
+                "opt",
+                "armadillo",
+                "include",
+                "armadillo_bits",
             ),
             # Needed for Mac Github Runners
             # for macos-10.15
@@ -563,7 +572,7 @@ def main():
                 os.path.join("src", "python_bindings", "loss_python.cpp"),
                 os.path.join("src", "python_bindings", "cache_python.cpp"),
                 os.path.join(
-                    "src", "python_bindings", "swap_times_python.cpp"
+                    "src", "python_bindings", "times_python.cpp"
                 ),
             ],
             include_dirs=include_dirs,
@@ -588,7 +597,7 @@ def main():
                         os.getcwd(),
                         r"headers\armadillo\examples\lib_win64"
                         + r"\libopenblas.dll",
-                        )
+                    )
                 ],
             )
         )

@@ -10,16 +10,26 @@
 #include <pybind11/numpy.h>
 #include <carma>
 #include <armadillo>
+#include <vector>
 
 #include "kmedoids_pywrapper.hpp"
 
 namespace km {
+  float km::KMedoidsWrapper::getBuildLossPython() {
+    return KMedoids::getBuildLoss();
+  }
+
   float km::KMedoidsWrapper::getLossPython() {
     return KMedoids::getAverageLoss();
   }
 
-  float km::KMedoidsWrapper::getBuildLossPython() {
-    return KMedoids::getBuildLoss();
+  std::vector<float> km::KMedoidsWrapper::getLossHistoryPython() {
+    return KMedoids::getLossHistory();
+  }
+
+  void build_loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
+    cls->def_property_readonly("build_loss",
+                               &KMedoidsWrapper::getBuildLossPython);
   }
 
   void loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
@@ -27,8 +37,8 @@ namespace km {
                                &KMedoidsWrapper::getLossPython);
   }
 
-  void build_loss_python(pybind11::class_ <KMedoidsWrapper> *cls) {
-    cls->def_property_readonly("build_loss",
-                               &KMedoidsWrapper::getBuildLossPython);
+  void loss_history_python(pybind11::class_ <KMedoidsWrapper> *cls) {
+    cls->def_property_readonly("losses",
+                               &KMedoidsWrapper::getLossHistoryPython);
   }
 }  // namespace km

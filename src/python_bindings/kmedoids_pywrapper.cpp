@@ -80,6 +80,7 @@ namespace km {
     fit_python(&cls);
     loss_python(&cls);
     build_loss_python(&cls);
+    loss_history_python(&cls);
 
     // Cache functions
     distance_computations_python(&cls);
@@ -91,7 +92,9 @@ namespace km {
     cache_misses_python(&cls);
 
     // Swap timing functions
+    total_build_time(&cls);
     time_per_swap_python(&cls);
     total_swap_time_python(&cls);
+    total_time(&cls);
   }
 }  // namespace km

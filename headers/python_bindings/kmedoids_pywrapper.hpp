@@ -7,6 +7,7 @@
 #include <carma>
 #include <armadillo>
 #include <string>
+#include <vector>
 
 #include "kmedoids_algorithm.hpp"
 
@@ -73,6 +74,10 @@ class KMedoidsWrapper : public km::KMedoids {
    */
   float getLossPython();
 
+
+  // TODO: @Luke : Add the docstring
+  std::vector<float> getLossHistoryPython();
+
   /**
    * @brief Returns the loss after the BUILD step
    *
@@ -119,6 +124,13 @@ class KMedoidsWrapper : public km::KMedoids {
   size_t getCacheMissesPython();
 
   /**
+   * @brief Returns the total time for the entire BUILD procedure by the last call to .fit()
+   *
+   * The total time for the entire BUILD procedure by the last call to .fit()
+   */
+  size_t getTotalBuildTimePython();
+
+  /**
    * @brief Returns the total time for the entire SWAP procedure by the last call to .fit()
    *
    * The total time for the entire SWAP procedure by the last call to .fit()
@@ -130,7 +142,14 @@ class KMedoidsWrapper : public km::KMedoids {
    *
    * The average time per swap step by the last call to .fit()
    */
-  float getTimePerSwapPython();
+  size_t getTimePerSwapPython();
+
+  /**
+   * @brief Returns the total time for the entire fitting procedure by the last call to .fit()
+   *
+   * The total time for the entire fitting procedure by the last call to .fit()
+   */
+  size_t getTotalTimePython();
 };
 
 // TODO(@motiwari): Encapsulate these
@@ -171,6 +190,11 @@ class KMedoidsWrapper : public km::KMedoids {
   void build_loss_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
 
   /**
+  * @brief Binding for the C++ function KMedoids::getLossHistory()
+  */
+  void loss_history_python(pybind11::class_ <KMedoidsWrapper> *cls);
+
+  /**
   * @brief Binding for the C++ function KMedoids::getDistanceComputations()
   */
   void
@@ -204,6 +228,11 @@ class KMedoidsWrapper : public km::KMedoids {
   void cache_misses_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
 
   /**
+  * @brief Binding for the C++ function KMedoids::getTotalBuildTime()
+  */
+  void total_build_time(pybind11::class_ <km::KMedoidsWrapper> *cls);
+
+  /**
   * @brief Binding for the C++ function KMedoids::getTotalSwapTime()
   */
   void total_swap_time_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
@@ -212,5 +241,10 @@ class KMedoidsWrapper : public km::KMedoids {
   * @brief Binding for the C++ function KMedoids::getTimePerSwap()
   */
   void time_per_swap_python(pybind11::class_ <km::KMedoidsWrapper> *cls);
+
+  /**
+  * @brief Binding for the C++ function KMedoids::getTotalTime()
+  */
+  void total_time(pybind11::class_ <km::KMedoidsWrapper> *cls);
 }  // namespace km
 #endif  // HEADERS_PYTHON_BINDINGS_KMEDOIDS_PYWRAPPER_HPP_

@@ -120,6 +120,10 @@ namespace km {
     return steps;
   }
 
+  std::vector<float> KMedoids::getLossHistory() const {
+    return loss_history;
+  }
+
   size_t KMedoids::getNMedoids() const {
     return nMedoids;
   }
@@ -216,6 +220,18 @@ namespace km {
     parallelize = newParallelize;
   }
 
+  size_t KMedoids::getBuildDistanceComputations() const {
+    return numBuildDistanceComputations;
+  }
+
+  size_t KMedoids::getSwapDistanceComputations() const {
+    return numSwapDistanceComputations;
+  }
+
+  size_t KMedoids::getMiscDistanceComputations() const {
+    return numMiscDistanceComputations;
+  }
+
   size_t KMedoids::getDistanceComputations(const bool includeMisc) const {
     if (includeMisc) {
       return numMiscDistanceComputations +
@@ -225,18 +241,6 @@ namespace km {
       return numBuildDistanceComputations +
              numSwapDistanceComputations;
     }
-  }
-
-  size_t KMedoids::getMiscDistanceComputations() const {
-    return numMiscDistanceComputations;
-  }
-
-  size_t KMedoids::getBuildDistanceComputations() const {
-    return numBuildDistanceComputations;
-  }
-
-  size_t KMedoids::getSwapDistanceComputations() const {
-    return numSwapDistanceComputations;
   }
 
   size_t KMedoids::getCacheWrites() const {
@@ -251,12 +255,20 @@ namespace km {
     return numCacheMisses;
   }
 
+  size_t KMedoids::getTotalBuildTime() const {
+    return totalBuildTime;
+  }
+
   size_t KMedoids::getTotalSwapTime() const {
     return totalSwapTime;
   }
 
-  float KMedoids::getTimePerSwap() const {
+  size_t KMedoids::getTimePerSwap() const {
     return totalSwapTime / steps;
+  }
+
+  size_t KMedoids::getTotalTime() const {
+    return totalTime;
   }
 
   void KMedoids::setLossFn(std::string loss) {
@@ -299,7 +311,6 @@ namespace km {
     }
   }
 
-
   void KMedoids::calcBestDistancesSwap(
           const arma::fmat &data,
           std::optional<std::reference_wrapper<const arma::fmat>> distMat,
@@ -313,10 +324,13 @@ namespace km {
       float best = std::numeric_limits<float>::infinity();
       float second = std::numeric_limits<float>::infinity();
       for (size_t k = 0; k < medoidIndices->n_cols; k++) {
-        // 0 for MISC
         float cost =
-                KMedoids::cachedLoss(data, distMat, i,
-                                     (*medoidIndices)(k), 0);
+                KMedoids::cachedLoss(
+                    data,
+                    distMat,
+                    i,
+                    (*medoidIndices)(k),
+                    0);  // 0 for MISC
         if (cost < best) {
           (*assignments)(i) = k;
           second = best;
@@ -341,7 +355,7 @@ namespace km {
           const arma::urowvec *medoidIndices) {
     float total = 0;
     // TODO(@motiwari): is this parallel loop accumulating properly?
-    #pragma omp parallel for if (this->parallelize)
+//    #pragma omp parallel for if (this->parallelize)
     for (size_t i = 0; i < data.n_cols; i++) {
       float cost = std::numeric_limits<float>::infinity();
       for (size_t k = 0; k < nMedoids; k++) {
@@ -370,22 +384,22 @@ namespace km {
           const size_t category,
           const bool useCacheFunctionOverride
   ) {
-    // TODO(@motiwari): Change category to an enum
-    if (category == 0) {  // MISC
-      numMiscDistanceComputations++;
-    } else if (category == 1) {  // BUILD
-      numBuildDistanceComputations++;
-    } else if (category == 2) {  // SWAP
-      numSwapDistanceComputations++;
-    } else {
-      // TODO(@motiwari): Throw exception
-    }
-
     if (this->useDistMat) {
       return distMat.value().get().at(i, j);
     }
 
     if (!useCache) {
+        // TODO(@motiwari): Change category to an enum
+        if (category == 0) {  // MISC
+          numMiscDistanceComputations++;
+        } else if (category == 1) {  // BUILD
+          numBuildDistanceComputations++;
+        } else if (category == 2) {  // SWAP
+          numSwapDistanceComputations++;
+        } else {
+          // TODO(@motiwari): Throw exception
+        }
+
       return (this->*lossFn)(data, i, j);
     }
 
@@ -398,12 +412,38 @@ namespace km {
       // TODO(@motiwari): Potential race condition with shearing?
       // T1 begins to write to cache and then T2
       // access in the middle of write?
-      if (cache[(m * i) + reindex[j]] == -1) {
+      if (cache[(m * i) + reindex[j]] == -1) {  // Cache value is unassigned
+        // TODO(@motiwari): Change category to an enum
+        if (category == 0) {  // MISC
+          numMiscDistanceComputations++;
+        } else if (category == 1) {  // BUILD
+          numBuildDistanceComputations++;
+        } else if (category == 2) {  // SWAP
+          numSwapDistanceComputations++;
+        } else {
+          // TODO(@motiwari): Throw exception
+        }
+
+        // cache miss! calculate the distance and cache it.
+        numCacheMisses++;
         numCacheWrites++;
         cache[(m * i) + reindex[j]] = (this->*lossFn)(data, i, j);
+      } else {
+        // cache hit!
+        numCacheHits++;
       }
-      numCacheHits++;
       return cache[m * i + reindex[j]];
+    }
+
+    // Point queried is not in the cache. Cache miss.
+    if (category == 0) {  // MISC
+      numMiscDistanceComputations++;
+    } else if (category == 1) {  // BUILD
+      numBuildDistanceComputations++;
+    } else if (category == 2) {  // SWAP
+      numSwapDistanceComputations++;
+    } else {
+      // TODO(@motiwari): Throw exception
     }
 
     numCacheMisses++;
@@ -454,3 +494,5 @@ namespace km {
     return arma::accu(arma::abs(data.col(i) - data.col(j)));
   }
 }  // namespace km
+
+

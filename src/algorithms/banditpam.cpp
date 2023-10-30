@@ -11,6 +11,10 @@
 #include <unordered_map>
 #include <cmath>
 #include <vector>
+#include <iostream>
+#include <algorithm>
+#include <chrono>
+
 
 namespace km {
   void BanditPAM::fitBanditPAM(
@@ -18,6 +22,7 @@ namespace km {
           std::optional<std::reference_wrapper<const arma::fmat>> distMat) {
     data = arma::trans(inputData);
 
+    const auto start = std::chrono::system_clock::now();
     // Note: even if we are using a distance matrix, we compute the permutation
     // in the block below because it is used elsewhere in the call stack
     // TODO(@motiwari): Remove need for data or permutation through when using
@@ -36,6 +41,7 @@ namespace km {
       permutationIdx = 0;
       reindex = {};  // TODO(@motiwari): Can this intialization be removed?
       // TODO(@motiwari): Can we parallelize this?
+//      #pragma omp parallel for if (this->parallelize)
       for (size_t counter = 0; counter < m; counter++) {
         reindex[permutation[counter]] = counter;
       }
@@ -43,14 +49,14 @@ namespace km {
 
     arma::fmat medoidMatrix(data.n_rows, nMedoids);
     arma::urowvec medoidIndices(nMedoids);
-    steps = 0;
+
     BanditPAM::build(data, distMat, &medoidIndices, &medoidMatrix);
-
-    buildLoss = KMedoids::calcLoss(data, distMat, &medoidIndices);
-
     medoidIndicesBuild = medoidIndices;
     arma::urowvec assignments(data.n_cols);
+    const auto build_end = std::chrono::system_clock::now();
+
     if (nMedoids > 1) {
+      steps = 0;
       BanditPAM::swap(
               data,
               distMat,
@@ -61,6 +67,14 @@ namespace km {
 
     medoidIndicesFinal = medoidIndices;
     labels = assignments;
+    const auto swap_end = std::chrono::system_clock::now();
+
+    size_t start_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
+    size_t build_end_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(build_end.time_since_epoch()).count();
+    size_t swap_end_size_t = std::chrono::duration_cast<std::chrono::milliseconds>(swap_end.time_since_epoch()).count();
+    totalBuildTime = build_end_size_t - start_size_t;
+    totalSwapTime = swap_end_size_t - build_end_size_t;
+    totalTime = swap_end_size_t - start_size_t;
   }
 
   arma::frowvec BanditPAM::buildSigma(
@@ -69,6 +83,10 @@ namespace km {
           const arma::frowvec &bestDistances,
           const bool useAbsolute) {
     size_t N = data.n_cols;
+    // Temporarily increase the batch size
+    // for precise estimation of the standard deviation
+    int originalBatchSize = batchSize;
+    batchSize = std::min(1000, static_cast<int>(N/4));
     arma::uvec referencePoints;
     // TODO(@motiwari): Make this wraparound properly as
     //  last batch_size elements are dropped
@@ -92,8 +110,12 @@ namespace km {
       for (size_t j = 0; j < batchSize; j++) {
         // 0 for MISC
         float cost =
-                KMedoids::cachedLoss(data, distMat, i,
-                                     referencePoints(j), 0);
+                KMedoids::cachedLoss(
+                    data,
+                    distMat,
+                    i,
+                    referencePoints(j),
+                    0); // 0 for MISC
         if (useAbsolute) {
           sample(j) = cost;
         } else {
@@ -104,6 +126,9 @@ namespace km {
       }
       updated_sigma(i) = arma::stddev(sample);
     }
+    // reset batchSize the original batch size as it's a global variable
+    // used by other functions (e.g. buildTarget, swapTarget)
+    batchSize = originalBatchSize;
     return updated_sigma;
   }
 
@@ -140,8 +165,7 @@ namespace km {
     for (size_t i = 0; i < target->n_rows; i++) {
         float total = 0;
       for (size_t j = 0; j < referencePoints.n_rows; j++) {
-          float cost =
-            KMedoids::cachedLoss(
+          float cost = KMedoids::cachedLoss(
                     data,
                     distMat,
                     (*target)(i),
@@ -179,6 +203,7 @@ namespace km {
     arma::frowvec ucbs(N);
     arma::frowvec numSamples(N, arma::fill::zeros);
     arma::frowvec exactMask(N, arma::fill::zeros);
+    float minSigma = 0.001;
 
     // TODO(@motiwari): #pragma omp parallel for if (this->parallelize)?
     for (size_t k = 0; k < nMedoids; k++) {
@@ -190,6 +215,15 @@ namespace km {
       estimates.fill(0);
       // compute std dev amongst batch of reference points
       sigma = buildSigma(data, distMat, bestDistances, useAbsolute);
+
+      // Replace the zero entries in sigma with the minimum non-zero
+      // sigma value. Otherwise, some candidates could have
+      // a 0 confidence interval.
+      // This step prevents the overestimated candidates from
+      // discarding underestimated candidates,
+      // which could lead to suboptimal results.
+      minSigma = arma::min(arma::nonzeros(sigma));
+      sigma.elem(arma::find(sigma == 0.0)).fill(minSigma);
 
       while (arma::sum(candidates) > precision) {
         // TODO(@motiwari): Do not need a matrix for this comparison,
@@ -238,7 +272,7 @@ namespace km {
                 arma::sqrt(adjust / numSamples.cols(targets));
         ucbs.cols(targets) = estimates.cols(targets) + confBoundDelta;
         lcbs.cols(targets) = estimates.cols(targets) - confBoundDelta;
-        candidates = (lcbs < ucbs.min()) && (exactMask == 0);
+        candidates = (lcbs <= ucbs.min()) && (exactMask == 0);
       }
 
       medoidIndices->at(k) = lcbs.index_min();
@@ -260,6 +294,10 @@ namespace km {
       // use difference of loss for sigma and sampling, not absolute
       useAbsolute = false;
     }
+
+    // log the loss
+    buildLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
+    loss_history.push_back(buildLoss);
   }
 
   arma::fmat BanditPAM::swapSigma(
@@ -271,6 +309,10 @@ namespace km {
     size_t N = data.n_cols;
     size_t K = nMedoids;
     arma::fmat updated_sigma(K, N, arma::fill::zeros);
+    // temporarily increase the batch size for precise estimation
+    // of the std dev
+    int originalBatchSize = batchSize;
+    batchSize = std::min(1000, static_cast<int>(N/4));
     arma::uvec referencePoints;
     // TODO(@motiwari): Make this wraparound properly
     //  as last batch_size elements are dropped
@@ -299,8 +341,12 @@ namespace km {
       for (size_t j = 0; j < batchSize; j++) {
         // 0 for MISC when estimating sigma
         float cost =
-          KMedoids::cachedLoss(data, distMat, n,
-                               referencePoints(j), 0);
+          KMedoids::cachedLoss(
+            data,
+            distMat,
+            n,
+            referencePoints(j),
+            0);
 
         if (k == (*assignments)(referencePoints(j))) {
           if (cost < (*secondBestDistances)(referencePoints(j))) {
@@ -319,6 +365,9 @@ namespace km {
       }
       updated_sigma(k, n) = arma::stddev(sample);
     }
+    // reset batchSize the original batch size as it's a global variable
+    // used by other functions (e.g. buildTarget, swapTarget)
+    batchSize = originalBatchSize;
     return updated_sigma;
   }
 
@@ -431,6 +480,7 @@ namespace km {
     arma::fmat lcbs(nMedoids, N);
     arma::fmat ucbs(nMedoids, N);
     arma::umat numSamples(nMedoids, N, arma::fill::zeros);
+    float minSigma = 0.001;
 
     // calculate quantities needed for swap, bestDistances and sigma
     calcBestDistancesSwap(
@@ -453,6 +503,10 @@ namespace km {
                 &bestDistances,
                 &secondBestDistances,
                 assignments);
+
+        // Fill in the zero sigma entries with the non-zero minimum sigma value
+        minSigma = arma::min(arma::nonzeros(sigma));
+        sigma.elem(arma::find(sigma == 0.0)).fill(minSigma);
 
         // Reset variables when starting a new swap
         candidates.fill(1);
@@ -496,7 +550,7 @@ namespace km {
             lcbs.cols(compute_exactly_targets) = result;
             exactMask.cols(compute_exactly_targets).fill(1);
             numSamples.cols(compute_exactly_targets) += N;
-            candidates = (lcbs < ucbs.min()) && (exactMask == 0);
+            candidates = (lcbs <= ucbs.min()) && (exactMask == 0);
           }
           if (arma::accu(candidates) < precision) {
             break;
@@ -544,7 +598,7 @@ namespace km {
           lcbs.cols(candidate_targets) = estimates.cols(candidate_targets)
                                          - confBoundDelta;
 
-          candidates = (lcbs < ucbs.min()) && (exactMask == 0);
+          candidates = (lcbs <= ucbs.min()) && (exactMask == 0);
       }
 
       // Perform the medoid switch
@@ -566,6 +620,9 @@ namespace km {
               &secondBestDistances,
               assignments,
               swapPerformed);
+
+      averageLoss = KMedoids::calcLoss(data, distMat, medoidIndices);
+      loss_history.push_back(averageLoss);
     }
   }
 }  // namespace km

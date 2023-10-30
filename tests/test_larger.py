@@ -25,8 +25,8 @@ class LargerTests(unittest.TestCase):
 
     def test_medium_mnist(self):
         """
-        Generate NUM_MEDIUM_CASES random subsets of MNIST
-        of size MEDIUM_SAMPLE_SIZE and verify BanditPAM agrees with PAM
+        Generate NUM_MEDIUM_CASES random subsets of MNIST of size
+        MEDIUM_SAMPLE_SIZE and verify BanditPAM agrees with PAM.
         """
         for i in range(NUM_MEDIUM_CASES):
             data = self.mnist_70k.sample(n=MEDIUM_SAMPLE_SIZE).to_numpy()
@@ -34,15 +34,17 @@ class LargerTests(unittest.TestCase):
                 k=SMALL_K_SCHEDULE[i % N_SMALL_K],
                 data=data,
                 loss="L2",
-                test_build=True,
+                test_build=False,
                 assert_immediately=True,
             )
 
     def test_various_medium_mnist(self):
         """
-        Generate NUM_MEDIUM_CASES random subsets of MNIST of various sizes
-        and verify BanditPAM agrees with PAM. Since PAM is very slow,
-        we can only do this for fairly small sizes in MEDIUM_SIZE_SCHEDULE
+        Generate NUM_MEDIUM_CASES random subsets of MNIST of various sizes and
+        verify BanditPAM agrees with PAM.
+
+        Since PAM is very slow, we can only do this for fairly small sizes in
+        MEDIUM_SIZE_SCHEDULE
         """
         for i in range(NUM_MEDIUM_CASES):
             size = MEDIUM_SIZE_SCHEDULE[i % NUM_MEDIUM_SIZES]
@@ -74,13 +76,13 @@ class LargerTests(unittest.TestCase):
             # TODO(@motiwari): Timing test will not work
             # need to compute it over number of steps
             self.assertTrue(
-                runtime < (size_multiplier**SCALING_EXPONENT) * base_runtime
+                runtime < (size_multiplier ** SCALING_EXPONENT) * base_runtime
             )
 
     def test_medium_scrna(self):
         """
-        Generate NUM_MEDIUM_CASES random subsets of MNIST
-        of size MEDIUM_SAMPLE_SIZE and verify BanditPAM agrees with PAM
+        Generate NUM_MEDIUM_CASES random subsets of MNIST of size
+        MEDIUM_SAMPLE_SIZE and verify BanditPAM agrees with PAM.
         """
         count = 0
         for i in range(NUM_MEDIUM_CASES):
@@ -96,9 +98,11 @@ class LargerTests(unittest.TestCase):
 
     def test_various_medium_scrna(self):
         """
-        Generate NUM_MEDIUM_CASES random subsets of scRNA of various sizes
-        and verify BanditPAM agrees with PAM. Since PAM is very slow,
-        we can only do this for fairly small sizes in MEDIUM_SIZE_SCHEDULE
+        Generate NUM_MEDIUM_CASES random subsets of scRNA of various sizes and
+        verify BanditPAM agrees with PAM.
+
+        Since PAM is very slow, we can only do this for fairly small sizes in
+        MEDIUM_SIZE_SCHEDULE
         """
         count = 0
         for i in range(NUM_MEDIUM_CASES):
@@ -132,7 +136,7 @@ class LargerTests(unittest.TestCase):
             # TODO(@motiwari): Timing test will not work
             # need to compute it over number of steps
             self.assertTrue(
-                runtime < (size_multiplier**SCALING_EXPONENT) * base_runtime
+                runtime < (size_multiplier ** SCALING_EXPONENT) * base_runtime
             )
 
 

@@ -77,6 +77,13 @@ class KMedoids {
   arma::urowvec getLabels() const;
 
   /**
+   * @brief Returns the losses of every build and swap step
+   *
+   * @returns Losses for each step
+   */
+  std::vector<float> getLossHistory() const;
+
+  /**
    * @brief Returns the number of SWAP steps performed.
    *
    * @returns Number of swap steps performed
@@ -195,7 +202,7 @@ class KMedoids {
   /**
    * @brief Get the average loss from the prior clustering
    *
-   * @returns The average clustering loss from the prior clusteringq
+   * @returns The average clustering loss from the prior clustering
    *
    * @throws If no clustering has been run yet
    */
@@ -274,6 +281,20 @@ class KMedoids {
   size_t getDistanceComputations(const bool includeMisc = false) const;
 
   /**
+   * @brief Get total sample complexity of BUILD step
+   *
+   * @return Total sample complexity of whole BUILD step
+   */
+  size_t getBuildDistanceComputations() const;
+
+  /**
+   * @brief Get total sample complexity of SWAP steps
+   *
+   * @return Total sample complexity of all SWAP steps
+   */
+  size_t getSwapDistanceComputations() const;
+
+  /**
    * @brief Get number of miscellaneous distance computations
    *
    * @return Total number of miscellaneous distance computations
@@ -281,18 +302,32 @@ class KMedoids {
   size_t getMiscDistanceComputations() const;
 
   /**
-   * @brief Get total sample complexity of BUILD step
+   * @brief Get total wall-clock time of BUILD step
    *
-   * @return Total sample complexity of last BUILD step
+   * @return Total wall-clock time of BUILD step
    */
-  size_t getBuildDistanceComputations() const;
+  size_t getTotalBuildTime() const;
 
   /**
-   * @brief Get total sample complexity of SWAP steps
+   * @brief Get total number of milliseconds for the whole SWAP procedure
    *
-   * @return Total sample complexity of last SWAP steps
+   * @return Total number of milliseconds for the whole SWAP procedure
    */
-  size_t getSwapDistanceComputations() const;
+  size_t getTotalSwapTime() const;
+
+  /**
+   * @brief Get average number of milliseconds per swap step
+   *
+   * @return Average number of milliseconds per swap step
+   */
+  size_t getTimePerSwap() const;
+
+  /**
+   * @brief Get total wall-clock time of clustering
+   *
+   * @return Total wall-clock time of clustering
+   */
+  size_t getTotalTime() const;
 
   /**
    * @brief Get number of times we wrote to the cache
@@ -314,20 +349,6 @@ class KMedoids {
    * @return Number of cache misses
    */
   size_t getCacheMisses() const;
-
-  /**
-   * @brief Get total number of milliseconds for the whole SWAP procedure
-   *
-   * @return Total number of milliseconds for the whole SWAP procedure
-   */
-  size_t getTotalSwapTime() const;
-
-  /**
-   * @brief Get average number of milliseconds per swap step
-   *
-   * @return Average number of milliseconds per swap step
-   */
-  float getTimePerSwap() const;
 
   /// The cache which stores pairwise distance computations
   float *cache;
@@ -493,6 +514,9 @@ class KMedoids {
   /// Indices of the medoids after clustering
   arma::urowvec medoidIndicesFinal;
 
+  /// Losses after BUILD and each SWAP step
+  std::vector<float> loss_history;
+
   /// Function pointer to the loss function to use
   float (KMedoids::*lossFn)(
           const arma::fmat &data,
@@ -538,15 +562,15 @@ class KMedoids {
 
   /// The number of non-cache distance computations we compute
   /// in the BUILD step. For debugging only.
-  size_t numMiscDistanceComputations = 0;
-
-  /// The number of non-cache distance computations we compute
-  /// in the BUILD step. For debugging only.
   size_t numBuildDistanceComputations = 0;
 
   /// The number of non-cache distance computations we compute.
   /// For debugging only.
   size_t numSwapDistanceComputations = 0;
+
+  /// The number of non-cache distance computations we compute
+  /// in various miscellaneous computations. For debugging only.
+  size_t numMiscDistanceComputations = 0;
 
   /// The number of cache hits (distance computations we reuse).
   /// For debugging only.
@@ -560,8 +584,14 @@ class KMedoids {
   /// need to compute. For debugging only.
   size_t numCacheMisses = 0;
 
-  /// The number of milliseconds taken per swap step, on average
+  /// The number of milliseconds taken for the whole BUILD procedure.
+  size_t totalBuildTime = 0;
+
+  /// The number of milliseconds taken for the whole SWAP procedure.
   size_t totalSwapTime = 0;
+
+  /// The number of milliseconds taken for the call, including overhead
+  size_t totalTime = 0;
 };
 }  // namespace km
 #endif  // HEADERS_ALGORITHMS_KMEDOIDS_ALGORITHM_HPP_
