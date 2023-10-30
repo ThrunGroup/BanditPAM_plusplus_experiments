@@ -12,7 +12,7 @@ brew install libomp armadillo
 sudo rm -rf build && mkdir build && sudo rm -rf banditpam.cpython-* banditpam.egg-info banditpam.egg-info/ tmp/ build/ && python -m pip uninstall -y banditpam
 
 # Install BanditPAM package
-pip install --no-use-pep517 --no-cache-dir --ignore-installed -vvvvv -e .
+sudo python -m pip install --no-use-pep517 --no-cache-dir --ignore-installed -vvvvv -e .
 
 # 2. Install datasets if necessary
 mkdir -p data

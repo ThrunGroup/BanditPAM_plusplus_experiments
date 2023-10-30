@@ -15,8 +15,6 @@ __version__ = "4.0.2"
 GHA = "GITHUB_ACTIONS"
 
 # For AWS instances
-os.environ["CC"] = "/usr/bin/g++"
-os.environ["CXX"] = "/usr/bin/g++"
 
 class get_pybind_include(object):
     """
